@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dev From Zero - Final Edition</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="bgCanvas"></canvas>
+
+  <div class="app">
+    <header>
+      <h1 class="logo">Dev From Zero</h1>
+      <div class="stats-grid">
+        <div class="stat-card">💰 $<span id="money">500</span></div>
+        <div class="stat-card">⭐ <span id="reputation">1.0</span></div>
+        <div class="stat-card">📈 Nível <span id="level">1</span></div>
+      </div>
+      <div class="xp-wrapper">
+        <div class="xp-container"><div id="xpBar" class="xp-fill"></div></div>
+        <div class="xp-info">
+          <small id="xpText">0 / 100 XP</small>
+          <span id="studioStatus" class="badge">Iniciante</span>
+        </div>
+      </div>
+    </header>
+
+    <nav class="tabs">
+      <button id="btn-dev" onclick="showTab('dev')" class="tab-btn active">🛠 Projeto</button>
+      <button id="btn-office" onclick="showTab('office')" class="tab-btn">🏢 Empresa</button>
+      <button id="btn-history" onclick="showTab('history')" class="tab-btn">📜 Notícias</button>
+    </nav>
+
+    <main id="dev" class="tab-content active">
+      <section class="glass-panel">
+        <div class="points-header">
+          <span>Pontos Disponíveis:</span>
+          <strong id="pointsInfo"><span id="currentPoints">0</span> / <span id="maxPoints">20</span></strong>
+        </div>
+
+        <div class="attr-stack" id="attrStack"></div>
+
+        <div id="marketTrend" class="trend-tag">🔥 Tendência: Gameplay</div>
+        <button id="publishBtn" class="main-btn" onclick="publishGame()" disabled>LANÇAR JOGO</button>
+      </section>
+    </main>
+
+    <main id="office" class="tab-content">
+      <div class="section-group">
+        <h3>🔬 Tecnologia</h3>
+        <div id="techTree" class="grid-list"></div>
+      </div>
+      <div class="section-group">
+        <h3>👥 Equipe</h3>
+        <div id="staffList" class="grid-list"></div>
+      </div>
+      <button onclick="resetGame()" class="reset-btn">Apagar Progresso</button>
+    </main>
+
+    <main id="history" class="tab-content">
+      <div id="gameLog" class="feed-container"></div>
+    </main>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>                                  
