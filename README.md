@@ -1,0 +1,2 @@
+# allgamecome-
+um tycoon aleatori
