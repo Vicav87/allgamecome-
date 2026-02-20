@@ -2,89 +2,264 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dev From Zero</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        /* CSS EMBUTIDO PARA EVITAR ERRO DE CARREGAMENTO */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #0a0f1e;
+            color: #e2e8f0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            padding: 10px; /* Reduzi para mobile */
+            position: relative;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #particlesCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .container {
+            width: 100%; /* Ocupa a tela toda no celular */
+            max-width: 850px; /* Mas não passa de 850px no PC */
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(5px);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 30, 60, 0.8);
+            border: 1px solid #2d3a5e;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.8rem; /* Menor para mobile */
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #a5f3fc, #38bdf8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+        }
+
+        .stats {
+            display: grid; /* Grid funciona melhor que flex no celular */
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            background: #1e2b3c;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            border: 1px solid #2d3a5e;
+        }
+
+        .stats div {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+        }
+
+        .xp-container {
+            width: 100%;
+            height: 20px;
+            background: #1e2b3c;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 5px;
+            border: 1px solid #2d3a5e;
+        }
+
+        #xpFill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #22c55e, #0ea5e9);
+            transition: width 0.4s ease;
+        }
+
+        .xp-text {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            overflow-x: auto; /* Permite scroll se os botões não couberem */
+            padding-bottom: 5px;
+        }
+
+        .tab-button {
+            flex: 1;
+            min-width: 100px;
+            padding: 10px 5px;
+            border: none;
+            border-radius: 10px;
+            background: #1e2b3c;
+            color: #94a3b8;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            border: 1px solid #2d3a5e;
+            white-space: nowrap;
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            box-shadow: 0 0 10px #2563eb80;
+        }
+
+        .tab-content { display: none; animation: fade 0.3s; }
+        .tab-content.active { display: block; }
+
+        @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+        .category-row {
+            display: flex;
+            flex-direction: column; /* Coluna no mobile */
+            gap: 10px;
+            background: #1e2b3c;
+            padding: 12px;
+            border-radius: 15px;
+            border: 1px solid #2d3a5e;
+            margin-bottom: 10px;
+        }
+
+        .category-row label { font-weight: bold; color: #a5f3fc; }
+
+        .btn-group { display: flex; flex-wrap: wrap; gap: 5px; }
+
+        button {
+            cursor: pointer;
+            transition: 0.2s;
+            border: none;
+        }
+
+        .btn-group button {
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: #3b82f6;
+            color: white;
+            font-weight: bold;
+        }
+
+        .btn-primary, .btn-secondary {
+            width: 100%;
+            padding: 15px;
+            margin: 5px 0;
+            border-radius: 10px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .btn-primary { background: #2563eb; }
+        .btn-secondary { background: #10b981; }
+
+        .info-cards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        @media (min-width: 600px) {
+            .info-cards { grid-template-columns: 1fr 1fr; }
+            .stats { grid-template-columns: repeat(4, 1fr); }
+            .category-row { flex-direction: row; align-items: center; }
+        }
+
+        .card {
+            background: #1e2b3c;
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid #2d3a5e;
+        }
+
+        .upgrades-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .upgrade-card {
+            background: #1e2b3c;
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid #2d3a5e;
+        }
+    </style>
 </head>
 <body>
     <canvas id="particlesCanvas"></canvas>
     <div class="container">
         <h1>🎮 Dev From Zero</h1>
+        
         <div class="stats">
-            <div>💰 $<span id="money"></span></div>
-            <div>⭐ Rep: <span id="reputation"></span></div>
-            <div>🔥 Hype: <span id="hype"></span></div>
-            <div>🧠 Level: <span id="level"></span>/50</div>
+            <div>💰 $<span id="money">0</span></div>
+            <div>⭐ Rep: <span id="reputation">0</span></div>
+            <div>🔥 Hyp: <span id="hype">0</span></div>
+            <div>🧠 Lvl: <span id="level">1</span>/50</div>
         </div>
-        <div class="xp-container">
-            <div id="xpFill"></div>
-        </div>
-        <p class="xp-text">XP: <span id="xp"></span> / <span id="xpNeeded"></span></p>
 
-        <!-- Abas -->
+        <div class="xp-container"><div id="xpFill"></div></div>
+        <p class="xp-text">XP: <span id="xp">0</span> / <span id="xpNeeded">125</span></p>
+
         <div class="tabs">
             <button class="tab-button active" data-tab="create">🎮 Criar Jogo</button>
             <button class="tab-button" data-tab="upgrades">📈 Upgrades</button>
-            <button class="tab-button" data-tab="stats">📊 Estatísticas</button>
+            <button class="tab-button" data-tab="stats">📊 Stats</button>
         </div>
 
-        <!-- Aba Criar Jogo -->
         <div id="create-tab" class="tab-content active">
-            <h2>🎨 Criar Jogo</h2>
-            <p>Limite por jogo: <span id="maxSpend"></span> pontos</p>
-            <div id="categoriesContainer" class="categories"></div>
-            <select id="genre">
+            <p style="text-align:center; margin-bottom:10px;">Limite: <span id="maxSpend">0</span> pts</p>
+            <div id="categoriesContainer"></div>
+            <select id="genre" style="width:100%; padding:10px; border-radius:10px; background:#1e2b3c; color:white; margin:10px 0;">
                 <option value="Indie">Indie</option>
                 <option value="FPS">FPS</option>
                 <option value="RPG">RPG</option>
-                <option value="Simulador">Simulador</option>
             </select>
-            <div class="action-buttons">
-                <button class="btn-primary" onclick="launchGame()">🚀 Lançar Jogo</button>
-                <button class="btn-secondary" onclick="testGame()">🎮 Testar Jogo</button>
-            </div>
-            <div id="testResult" class="test-result" style="display: none;">
-                <h4>📊 Resultado do Teste</h4>
-                <div class="score-bar-container">
-                    <div id="testScoreBar" class="score-bar"></div>
-                </div>
-                <p id="testScoreText"></p>
-            </div>
+            <button class="btn-primary" onclick="launchGame()">🚀 Lançar Jogo</button>
+            <button class="btn-secondary" onclick="testGame()">🎮 Testar Jogo</button>
         </div>
 
-        <!-- Aba Upgrades -->
         <div id="upgrades-tab" class="tab-content">
-            <h2>📈 Progressão por Nível</h2>
-            <div class="upgrades-grid" id="upgradesList"></div>
-            <h2 style="margin-top: 30px;">🏢 Funcionários e Melhorias</h2>
-            <div class="shop-grid" id="shopContainer"></div>
+            <div class="upgrades-grid" id="shopContainer"></div>
         </div>
 
-        <!-- Aba Estatísticas -->
         <div id="stats-tab" class="tab-content">
-            <h2>📊 Estatísticas Detalhadas</h2>
-            <div class="stats-grid">
-                <div class="stat-card">🎮 Jogos lançados: <span id="gamesCount">0</span></div>
-                <div class="stat-card">💰 Total ganho: <span id="totalEarned">0</span></div>
-                <div class="stat-card">⭐ Reputação média: <span id="avgRep">0</span></div>
-                <div class="stat-card">🔥 Hype máximo: <span id="maxHype">0</span></div>
+            <div class="card">
+                <p>Jogos: <span id="gamesCount">0</span></p>
+                <p>Total: $<span id="totalEarned">0</span></p>
             </div>
         </div>
 
-        <hr>
-
-        <!-- Cards de notícias e tendências -->
         <div class="info-cards">
-            <div class="card">
-                <h3>🌍 Tendência Atual</h3>
-                <p id="marketInfo"></p>
-            </div>
-            <div class="card">
-                <h3>📰 Última Review</h3>
-                <p id="review">Nenhum jogo lançado ainda.</p>
-            </div>
+            <div class="card"><h3>🌍 Tendência</h3><p id="marketInfo">Carregando...</p></div>
+            <div class="card"><h3>📰 Review</h3><p id="review">Nenhum jogo ainda.</p></div>
         </div>
 
-        <button class="btn-reset" onclick="resetGame()">Resetar Jogo</button>
+        <button onclick="resetGame()" style="background:none; color:red; border:none; width:100%; margin-top:20px; font-size:0.7rem;">Resetar Tudo</button>
     </div>
 
     <script src="script.js"></script>
