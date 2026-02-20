@@ -1,10 +1,9 @@
 const MAX_LEVEL = 50;
-const BASE_POINTS = 25;              // Limite inicial por jogo
-const POINTS_PER_LEVEL = 5;           // Aumento por nível
+const BASE_POINTS = 25;
+const POINTS_PER_LEVEL = 5;
 const XP_PER_LEVEL_BASE = 100;
-const XP_GAIN_MULTIPLIER = 25;        // Aumentado de 12 para 25
+const XP_GAIN_MULTIPLIER = 25;
 
-// Categorias de atributos
 const CATEGORIES = [
     { id: 'gameplay', name: 'Gameplay', baseWeight: 1.2, unlockedAt: 1 },
     { id: 'graphics', name: 'Gráficos', baseWeight: 1.1, unlockedAt: 1 },
@@ -18,7 +17,6 @@ const CATEGORIES = [
     { id: 'postlaunch', name: 'Suporte Pós-Lançamento', baseWeight: 1.0, unlockedAt: 25 }
 ];
 
-// Tiers de progressão (para exibição)
 const UPGRADE_TIERS = [
     { level: 1, name: 'Dev de Quarto', perks: ['Indie only', 'Sem hype forte', 'Penalidade leve em otimização'] },
     { level: 5, name: 'Freelancer', perks: ['Multiplayer liberado', 'Pequeno hype', 'Contratar Dev Júnior'] },
@@ -33,7 +31,6 @@ const UPGRADE_TIERS = [
     { level: 50, name: 'DEV GOD MODE', perks: ['+10% todos atributos', 'Penalidade bug zero', 'Reputação nunca < 70'] }
 ];
 
-// Funcionários e melhorias (expandido)
 const HIRING_UPGRADES = [
     { id: 'intern', name: 'Estagiário', cost: 500, effect: 'pointsPerLevel', value: 2, description: '+2 pontos por nível' },
     { id: 'junior', name: 'Dev Júnior', cost: 2000, effect: 'salesMultiplier', value: 0.05, description: '+5% de vendas' },
@@ -50,10 +47,9 @@ const INFRA_UPGRADES = [
     { id: 'office', name: 'Escritório', cost: 8000, effect: 'reputationPerGame', value: 2, description: '+2 reputação por jogo' },
     { id: 'engine', name: 'Engine Própria', cost: 15000, effect: 'xpMultiplier', value: 0.15, description: '+15% de XP' },
     { id: 'datacenter', name: 'Data Center', cost: 30000, effect: 'maxSpendBonus', value: 10, description: '+10 no limite por jogo' },
-    { id: 'mocap', name: 'Motion Capture', cost: 25000, effect: 'qualityBonus', value: 0.2, description: '+20% na nota (multiplicador)' } // novo efeito
+    { id: 'mocap', name: 'Motion Capture', cost: 25000, effect: 'qualityBonus', value: 0.2, description: '+20% na nota (multiplicador)' }
 ];
 
-// Estado do jogador
 let player = {
     level: 1,
     xp: 0,
@@ -70,14 +66,12 @@ let player = {
 let market = {};
 let purchasedUpgrades = {};
 
-// Inicializa purchasedUpgrades com false para todos os upgrades
 function initPurchasedUpgrades() {
     const allIds = [...HIRING_UPGRADES, ...INFRA_UPGRADES].map(u => u.id);
     allIds.forEach(id => purchasedUpgrades[id] = false);
 }
 initPurchasedUpgrades();
 
-// Gera tendência de mercado aleatória
 function randomMarket() {
     const attrs = CATEGORIES.map(c => c.id);
     const genres = ['FPS', 'RPG', 'Simulador'];
@@ -89,12 +83,10 @@ function randomMarket() {
     };
 }
 
-// Salva no localStorage
 function save() {
     localStorage.setItem('devZeroSave', JSON.stringify({ player, market, purchasedUpgrades }));
 }
 
-// Carrega do localStorage
 function load() {
     const data = localStorage.getItem('devZeroSave');
     if (data) {
@@ -112,12 +104,10 @@ function load() {
     }
 }
 
-// Retorna categorias desbloqueadas no nível atual
 function getUnlockedCategories() {
     return CATEGORIES.filter(cat => cat.unlockedAt <= player.level);
 }
 
-// Funções de bônus dos upgrades
 function getBonus(effect) {
     let total = 0;
     for (let [id, purchased] of Object.entries(purchasedUpgrades)) {
@@ -155,10 +145,9 @@ function getHypePerGameBonus() {
 }
 
 function getQualityBonus() {
-    return 1 + getBonus('qualityBonus'); // multiplicador de nota
+    return 1 + getBonus('qualityBonus');
 }
 
-// Renderiza os inputs das categorias (com botões)
 function renderCategoryInputs() {
     const container = document.getElementById('categoriesContainer');
     const unlocked = getUnlockedCategories();
@@ -195,7 +184,6 @@ function renderCategoryInputs() {
     });
 }
 
-// Renderiza os tiers de progressão
 function renderUpgrades() {
     const container = document.getElementById('upgradesList');
     container.innerHTML = '';
@@ -211,7 +199,6 @@ function renderUpgrades() {
     });
 }
 
-// Renderiza a loja de upgrades
 function renderShop() {
     const container = document.getElementById('shopContainer');
     container.innerHTML = '';
@@ -243,7 +230,6 @@ function renderShop() {
     });
 }
 
-// Compra um upgrade
 function buyUpgrade(upgradeId) {
     const upgrade = [...HIRING_UPGRADES, ...INFRA_UPGRADES].find(u => u.id === upgradeId);
     if (!upgrade) return;
@@ -265,7 +251,6 @@ function buyUpgrade(upgradeId) {
     updateUI();
 }
 
-// Atualiza a aba de estatísticas
 function updateStatsTab() {
     document.getElementById('gamesCount').innerText = player.gamesLaunched;
     document.getElementById('totalEarned').innerText = player.totalEarned;
@@ -274,7 +259,6 @@ function updateStatsTab() {
     document.getElementById('maxHype').innerText = player.maxHype;
 }
 
-// Atualiza toda a interface
 function updateUI() {
     document.getElementById('money').innerText = player.money;
     document.getElementById('reputation').innerText = player.reputation;
@@ -302,7 +286,6 @@ function updateUI() {
     updateStatsTab();
 }
 
-// Calcula a nota do jogo (0 a 10) com bônus de qualidade
 function calculateScore(gameValues, genre) {
     const unlocked = getUnlockedCategories();
     let weightedSum = 0;
@@ -327,11 +310,10 @@ function calculateScore(gameValues, genre) {
     }
 
     let score = (weightedSum / maxPossibleSum) * 10;
-    score *= getQualityBonus(); // aplica bônus de qualidade
+    score *= getQualityBonus();
     return Math.min(10, score);
 }
 
-// Ganho de XP (com multiplicador dos upgrades) e aumento do limite base ao subir de nível
 function gainXP(score) {
     const xpGain = Math.floor(score * XP_GAIN_MULTIPLIER * getXPMultiplier());
     player.xp += xpGain;
@@ -348,12 +330,10 @@ function gainXP(score) {
     }
 
     if (leveledUp) {
-        // Mensagem especial de level up
         alert(`🎉 PARABÉNS! Você alcançou o nível ${player.level}!\n\n🔹 Pontos por jogo aumentaram para ${player.basePoints + getMaxSpendBonus()}\n🔹 Reputação +2\n🔹 Novas categorias podem ter sido desbloqueadas!`);
     }
 }
 
-// Lançar um novo jogo
 function launchGame() {
     const unlocked = getUnlockedCategories();
     const gameValues = {};
@@ -402,7 +382,6 @@ function launchGame() {
     updateUI();
 }
 
-// Testar jogo
 function testGame() {
     const unlocked = getUnlockedCategories();
     const gameValues = {};
@@ -435,13 +414,11 @@ function testGame() {
     }
 }
 
-// Reset completo
 function resetGame() {
     localStorage.removeItem('devZeroSave');
     location.reload();
 }
 
-// Sistema de abas
 function initTabs() {
     const tabs = document.querySelectorAll('.tab-button');
     const contents = document.querySelectorAll('.tab-content');
@@ -458,7 +435,6 @@ function initTabs() {
     });
 }
 
-// Partículas de fundo
 let canvas, ctx, particles = [];
 const PARTICLE_COUNT = 80;
 
@@ -507,7 +483,6 @@ function animateParticles() {
     requestAnimationFrame(animateParticles);
 }
 
-// Inicialização
 load();
 updateUI();
 initTabs();
