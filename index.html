@@ -1,68 +1,92 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dev From Zero - Final Edition</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>Dev From Zero</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <canvas id="bgCanvas"></canvas>
-
-  <div class="app">
-    <header>
-      <h1 class="logo">Dev From Zero</h1>
-      <div class="stats-grid">
-        <div class="stat-card">💰 $<span id="money">500</span></div>
-        <div class="stat-card">⭐ <span id="reputation">1.0</span></div>
-        <div class="stat-card">📈 Nível <span id="level">1</span></div>
-      </div>
-      <div class="xp-wrapper">
-        <div class="xp-container"><div id="xpBar" class="xp-fill"></div></div>
-        <div class="xp-info">
-          <small id="xpText">0 / 100 XP</small>
-          <span id="studioStatus" class="badge">Iniciante</span>
+    <canvas id="particlesCanvas"></canvas>
+    <div class="container">
+        <h1>🎮 Dev From Zero</h1>
+        <div class="stats">
+            <div>💰 $<span id="money"></span></div>
+            <div>⭐ Rep: <span id="reputation"></span></div>
+            <div>🔥 Hype: <span id="hype"></span></div>
+            <div>🧠 Level: <span id="level"></span>/50</div>
         </div>
-      </div>
-    </header>
+        <div class="xp-container">
+            <div id="xpFill"></div>
+        </div>
+        <p class="xp-text">XP: <span id="xp"></span> / <span id="xpNeeded"></span></p>
 
-    <nav class="tabs">
-      <button id="btn-dev" onclick="showTab('dev')" class="tab-btn active">🛠 Projeto</button>
-      <button id="btn-office" onclick="showTab('office')" class="tab-btn">🏢 Empresa</button>
-      <button id="btn-history" onclick="showTab('history')" class="tab-btn">📜 Notícias</button>
-    </nav>
-
-    <main id="dev" class="tab-content active">
-      <section class="glass-panel">
-        <div class="points-header">
-          <span>Pontos Disponíveis:</span>
-          <strong id="pointsInfo"><span id="currentPoints">0</span> / <span id="maxPoints">20</span></strong>
+        <!-- Abas -->
+        <div class="tabs">
+            <button class="tab-button active" data-tab="create">🎮 Criar Jogo</button>
+            <button class="tab-button" data-tab="upgrades">📈 Upgrades</button>
+            <button class="tab-button" data-tab="stats">📊 Estatísticas</button>
         </div>
 
-        <div class="attr-stack" id="attrStack"></div>
+        <!-- Aba Criar Jogo -->
+        <div id="create-tab" class="tab-content active">
+            <h2>🎨 Criar Jogo</h2>
+            <p>Limite por jogo: <span id="maxSpend"></span> pontos</p>
+            <div id="categoriesContainer" class="categories"></div>
+            <select id="genre">
+                <option value="Indie">Indie</option>
+                <option value="FPS">FPS</option>
+                <option value="RPG">RPG</option>
+                <option value="Simulador">Simulador</option>
+            </select>
+            <div class="action-buttons">
+                <button class="btn-primary" onclick="launchGame()">🚀 Lançar Jogo</button>
+                <button class="btn-secondary" onclick="testGame()">🎮 Testar Jogo</button>
+            </div>
+            <div id="testResult" class="test-result" style="display: none;">
+                <h4>📊 Resultado do Teste</h4>
+                <div class="score-bar-container">
+                    <div id="testScoreBar" class="score-bar"></div>
+                </div>
+                <p id="testScoreText"></p>
+            </div>
+        </div>
 
-        <div id="marketTrend" class="trend-tag">🔥 Tendência: Gameplay</div>
-        <button id="publishBtn" class="main-btn" onclick="publishGame()" disabled>LANÇAR JOGO</button>
-      </section>
-    </main>
+        <!-- Aba Upgrades -->
+        <div id="upgrades-tab" class="tab-content">
+            <h2>📈 Progressão por Nível</h2>
+            <div class="upgrades-grid" id="upgradesList"></div>
+            <h2 style="margin-top: 30px;">🏢 Funcionários e Melhorias</h2>
+            <div class="shop-grid" id="shopContainer"></div>
+        </div>
 
-    <main id="office" class="tab-content">
-      <div class="section-group">
-        <h3>🔬 Tecnologia</h3>
-        <div id="techTree" class="grid-list"></div>
-      </div>
-      <div class="section-group">
-        <h3>👥 Equipe</h3>
-        <div id="staffList" class="grid-list"></div>
-      </div>
-      <button onclick="resetGame()" class="reset-btn">Apagar Progresso</button>
-    </main>
+        <!-- Aba Estatísticas -->
+        <div id="stats-tab" class="tab-content">
+            <h2>📊 Estatísticas Detalhadas</h2>
+            <div class="stats-grid">
+                <div class="stat-card">🎮 Jogos lançados: <span id="gamesCount">0</span></div>
+                <div class="stat-card">💰 Total ganho: <span id="totalEarned">0</span></div>
+                <div class="stat-card">⭐ Reputação média: <span id="avgRep">0</span></div>
+                <div class="stat-card">🔥 Hype máximo: <span id="maxHype">0</span></div>
+            </div>
+        </div>
 
-    <main id="history" class="tab-content">
-      <div id="gameLog" class="feed-container"></div>
-    </main>
-  </div>
+        <hr>
 
-  <script src="game.js"></script>
+        <!-- Cards de notícias e tendências -->
+        <div class="info-cards">
+            <div class="card">
+                <h3>🌍 Tendência Atual</h3>
+                <p id="marketInfo"></p>
+            </div>
+            <div class="card">
+                <h3>📰 Última Review</h3>
+                <p id="review">Nenhum jogo lançado ainda.</p>
+            </div>
+        </div>
+
+        <button class="btn-reset" onclick="resetGame()">Resetar Jogo</button>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
