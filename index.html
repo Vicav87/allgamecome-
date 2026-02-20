@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dev From Zero - Níveis e Upgrades</title>
+    <title>Dev From Zero - Level 50 Edition</title>
     <style>
         :root {
             --neon: #00ffaa;
@@ -49,28 +49,24 @@
         .tab-content { display: none; animation: slideUp 0.4s ease; }
         .tab-content.active { display: block; }
 
-        /* ATRIBUTOS */
-        .attr-card { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 18px; margin-bottom: 12px; }
-        .attr-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: 600; font-size: 0.9rem; }
-        .btn-group { display: flex; gap: 5px; }
-        .ctrl-btn { flex: 1; border: none; padding: 10px 0; border-radius: 8px; background: #22222e; color: #fff; cursor: pointer; font-weight: bold; }
-
-        /* UPGRADES E NÍVEIS */
+        /* UPGRADES */
         .level-header { background: rgba(0,255,170,0.1); padding: 10px; border-radius: 10px; text-align: center; margin-bottom: 15px; border: 1px dashed var(--neon); }
         .upgrade-item { 
             background: var(--card-bg); padding: 15px; border-radius: 15px; 
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05);
         }
-        .locked { opacity: 0.4; filter: grayscale(1); border-color: transparent; }
-        .owned { border-color: var(--neon); background: rgba(0,255,170,0.05); }
+        .locked { opacity: 0.3; filter: grayscale(1); }
+        .owned { border-color: var(--neon); background: rgba(0,255,170,0.08); }
         
-        .lvl-badge { background: #333; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-right: 5px; }
-        .buy-btn { background: var(--neon); border: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .lvl-badge { background: #333; color: var(--neon); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; }
+        .bonus-tag { font-size: 0.65rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .buy-btn { background: var(--neon); border: none; padding: 10px 14px; border-radius: 10px; font-weight: bold; cursor: pointer; }
         .buy-btn:disabled { background: #444; color: #888; cursor: not-allowed; }
 
         .feed { max-height: 250px; overflow-y: auto; }
-        .log-entry { background: var(--card-bg); padding: 10px; border-radius: 10px; margin-bottom: 8px; border-left: 4px solid #444; font-size: 0.8rem; }
+        .log-entry { background: var(--card-bg); padding: 12px; border-radius: 12px; margin-bottom: 8px; border-left: 4px solid var(--neon); font-size: 0.8rem; }
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
@@ -83,36 +79,31 @@
         <header>
             <h1 class="logo">Dev From Zero</h1>
             <div class="stats-grid">
-                <div class="stat-card"><small>Money</small><b>$<span id="money">0</span></b></div>
+                <div class="stat-card"><small>Grana</small><b>$<span id="money">0</span></b></div>
                 <div class="stat-card"><small>Rep</small><b>⭐<span id="reputation">0</span></b></div>
-                <div class="stat-card"><small>Level</small><b><span id="level">1</span></b></div>
+                <div class="stat-card"><small>Level</small><b><span id="level">1</span>/50</b></div>
             </div>
             <div class="xp-container"><div id="xpBar" class="xp-fill"></div></div>
         </header>
 
         <nav class="tabs">
             <button onclick="showTab('dev')" class="tab-btn active" id="btn-dev">🛠 Projeto</button>
-            <button onclick="showTab('office')" class="tab-btn" id="btn-office">🏢 Empresa</button>
+            <button onclick="showTab('office')" class="tab-btn" id="btn-office">🏢 Upgrades</button>
             <button onclick="showTab('history')" class="tab-btn" id="btn-history">📜 Feed</button>
         </nav>
 
         <main id="dev" class="tab-content active">
-            <div style="text-align: center; font-size: 0.8rem; margin-bottom: 15px;">
-                Pontos: <strong id="currentPoints">0</strong> / <strong id="maxPoints">0</strong>
+            <div style="text-align: center; font-size: 0.85rem; margin-bottom: 15px; color: #aaa;">
+                Capacidade de Pontos: <strong id="currentPoints" style="color:var(--neon)">0</strong> / <strong id="maxPoints">0</strong>
             </div>
             <div id="attrContainer"></div>
-            <button id="publishBtn" style="width:100%; padding:18px; border-radius:15px; border:none; background:var(--neon); font-weight:800; cursor:pointer;" onclick="publishGame()" disabled>LANÇAR JOGO</button>
+            <button id="publishBtn" style="width:100%; padding:18px; border-radius:15px; border:none; background:var(--neon); font-weight:900; cursor:pointer; margin-top:10px;" onclick="publishGame()" disabled>LANÇAR JOGO</button>
         </main>
 
         <main id="office" class="tab-content">
-            <div class="level-header">
-                Seu Nível Atual: <strong id="currentLvlDisplay">1</strong>
-            </div>
-            
-            <h4 style="color: var(--neon); margin: 0 0 10px 0;">🚀 Upgrades Disponíveis</h4>
+            <div class="level-header">Seu Nível: <strong id="currentLvlDisplay">1</strong></div>
             <div id="upgradeList"></div>
-            
-            <center><small onclick="resetGame()" style="cursor:pointer; opacity:0.3; margin-top:20px; display:block;">Zerar Tudo</small></center>
+            <center><small onclick="resetGame()" style="cursor:pointer; opacity:0.2; display:block; margin: 20px;">Resetar Save</small></center>
         </main>
 
         <main id="history" class="tab-content">
@@ -127,13 +118,19 @@
             stats: { gameplay: 0, graphics: 0, story: 0, optimization: 0 }
         };
 
-        // LISTA ÚNICA DE UPGRADES COM NÍVEIS
-        const ALL_UPGRADES = [
-            { id: "pc1", name: "Monitor Ultra-Wide", cost: 300, level: 2, desc: "+10 pontos max", type: "tech" },
-            { id: "junior", name: "Estagiário", cost: 800, level: 3, desc: "Ajuda na Otimização", type: "staff" },
-            { id: "engine", name: "Engine 2D Pro", cost: 1500, level: 5, desc: "Melhora Gameplay", type: "tech" },
-            { id: "senior", name: "Dev Senior", cost: 3500, level: 10, desc: "Corta bugs pela metade", type: "staff" },
-            { id: "office1", name: "Escritório Próprio", cost: 10000, level: 15, desc: "Dobra Reputação", type: "tech" }
+        // LISTA DE UPGRADES ATÉ O NÍVEL 50
+        const UPGRADES = [
+            { id: "desk", name: "Cadeira Gamer", cost: 400, level: 2, bonus: "points", val: 5, desc: "+5 Pontos de capacidade" },
+            { id: "course", name: "Curso Online", cost: 900, level: 4, bonus: "xp", val: 1.2, desc: "+20% Ganho de XP" },
+            { id: "coffee", name: "Cafeteira Pro", cost: 1500, level: 6, bonus: "points", val: 10, desc: "+10 Pontos de capacidade" },
+            { id: "ads", name: "Anúncios Básicos", cost: 2500, level: 8, bonus: "money", val: 1.3, desc: "+30% Lucro nos jogos" },
+            { id: "pc_mid", name: "PC Intermediário", cost: 4500, level: 12, bonus: "points", val: 20, desc: "+20 Pontos de capacidade" },
+            { id: "junior", name: "Dev Junior", cost: 8000, level: 15, bonus: "xp", val: 1.5, desc: "+50% Ganho de XP" },
+            { id: "engine", name: "Engine 3D", cost: 15000, level: 20, bonus: "money", val: 1.8, desc: "+80% Lucro nos jogos" },
+            { id: "setup", name: "Setup Dual-Monitor", cost: 25000, level: 25, bonus: "points", val: 40, desc: "+40 Pontos de capacidade" },
+            { id: "office", name: "Pequeno Escritório", cost: 50000, level: 30, bonus: "money", val: 2.5, desc: "2.5x Mais lucro" },
+            { id: "senior", name: "Dev Senior", cost: 120000, level: 40, bonus: "xp", val: 2.5, desc: "2.5x Mais Experiência" },
+            { id: "legend", name: "Sede Global", cost: 500000, level: 50, bonus: "money", val: 5.0, desc: "5x Lucro (Nível Máximo)" }
         ];
 
         function showTab(id) {
@@ -148,13 +145,14 @@
             document.getElementById('reputation').innerText = game.reputation.toFixed(1);
             document.getElementById('level').innerText = game.level;
             document.getElementById('currentLvlDisplay').innerText = game.level;
-            
             document.getElementById('xpBar').style.width = (game.xp / game.xpNeeded * 100) + "%";
 
+            // Cálculo dinâmico de Capacidade Máxima
+            let bonusPoints = 0;
+            UPGRADES.filter(u => u.bonus === "points" && game.inventory.includes(u.id)).forEach(u => bonusPoints += u.val);
+            const max = 20 + (game.level * 5) + bonusPoints;
             const current = Object.values(game.stats).reduce((a, b) => a + b, 0);
-            const extraPoints = game.inventory.includes('pc1') ? 10 : 0;
-            const max = 20 + (game.level * 5) + extraPoints;
-            
+
             document.getElementById('currentPoints').innerText = current;
             document.getElementById('maxPoints').innerText = max;
             document.getElementById('publishBtn').disabled = (current === 0);
@@ -171,6 +169,7 @@
                     <div class="btn-group">
                         <button class="ctrl-btn" onclick="modifyAttr('${key}', 1, ${max}, ${current})">+1</button>
                         <button class="ctrl-btn" onclick="modifyAttr('${key}', 5, ${max}, ${current})">+5</button>
+                        <button class="ctrl-btn" onclick="modifyAttr('${key}', 10, ${max}, ${current})">+10</button>
                     </div>
                 </div>
             `).join('');
@@ -185,19 +184,20 @@
 
         function renderUpgradeTab() {
             const list = document.getElementById('upgradeList');
-            list.innerHTML = ALL_UPGRADES.map(u => {
+            list.innerHTML = UPGRADES.map(u => {
                 const isLocked = game.level < u.level;
                 const isOwned = game.inventory.includes(u.id);
-                
                 return `
                 <div class="upgrade-item ${isLocked ? 'locked' : ''} ${isOwned ? 'owned' : ''}">
                     <div>
-                        <span class="lvl-badge">LVL ${u.level}</span>
-                        <b style="font-size:0.85rem">${u.name}</b><br>
-                        <small style="color:#888">${u.desc}</small>
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                            <span class="lvl-badge">LVL ${u.level}</span>
+                            <b style="font-size:0.9rem">${u.name}</b>
+                        </div>
+                        <span class="bonus-tag">${u.desc}</span>
                     </div>
                     <button class="buy-btn" onclick="buyItem('${u.id}', ${u.cost})" ${(isLocked || isOwned) ? 'disabled' : ''}>
-                        ${isOwned ? 'OK' : '$'+u.cost}
+                        ${isOwned ? '✓' : '$' + u.cost}
                     </button>
                 </div>`;
             }).join('');
@@ -214,14 +214,22 @@
 
         function publishGame() {
             const totalPoints = Object.values(game.stats).reduce((a, b) => a + b, 0);
-            const note = Math.min(10, (totalPoints / (20 + game.level * 5) * 10)).toFixed(1);
-            const profit = Math.floor(note * 150 * game.reputation);
+            const note = Math.min(10, (totalPoints / (20 + game.level * 4) * 10)).toFixed(1);
+            
+            // Aplicar Bônus de Dinheiro dos Upgrades
+            let moneyMult = 1.0;
+            UPGRADES.filter(u => u.bonus === "money" && game.inventory.includes(u.id)).forEach(u => moneyMult = u.val);
+            const profit = Math.floor(note * 150 * game.reputation * moneyMult);
+
+            // Aplicar Bônus de XP dos Upgrades
+            let xpMult = 1.0;
+            UPGRADES.filter(u => u.bonus === "xp" && game.inventory.includes(u.id)).forEach(u => xpMult = u.val);
 
             game.money += profit;
-            game.reputation += note > 7 ? 0.1 : 0.02;
+            game.reputation += note > 8 ? 0.2 : 0.05;
             
             addLog(note, profit);
-            gainXP(Math.floor(note * 30));
+            gainXP(Math.floor(note * 30 * xpMult));
             
             game.stats = { gameplay: 0, graphics: 0, story: 0, optimization: 0 };
             updateUI();
@@ -229,34 +237,35 @@
         }
 
         function gainXP(amt) {
+            if (game.level >= 50) return;
             game.xp += amt;
-            while (game.xp >= game.xpNeeded) {
+            while (game.xp >= game.xpNeeded && game.level < 50) {
                 game.xp -= game.xpNeeded;
                 game.level++;
-                game.xpNeeded = Math.floor(game.xpNeeded * 1.4);
+                game.xpNeeded = Math.floor(game.xpNeeded * 1.35);
             }
         }
 
         function addLog(n, p) {
             const d = document.createElement('div');
             d.className = "log-entry";
-            d.innerHTML = `<b>Nota: ${n}/10</b> | Lucro: $${p}`;
+            d.innerHTML = `<b>Lançamento: ${n}/10</b><br><small>Receita: +$${p}</small>`;
             document.getElementById('gameLog').prepend(d);
         }
 
-        function saveGame() { localStorage.setItem('DevZero_Levels', JSON.stringify(game)); }
+        function saveGame() { localStorage.setItem('DevZero_Final_S50', JSON.stringify(game)); }
         function loadGame() {
-            const s = localStorage.getItem('DevZero_Levels');
+            const s = localStorage.getItem('DevZero_Final_S50');
             if(s) { game = JSON.parse(s); updateUI(); }
         }
-        function resetGame() { localStorage.clear(); location.reload(); }
+        function resetGame() { if(confirm("Deseja apagar seu império?")) { localStorage.clear(); location.reload(); } }
 
-        // Fundo Animado
+        // Fundo
         const canvas = document.getElementById('bgCanvas'); const ctx = canvas.getContext('2d');
         let pts = [];
         function initC() {
             canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            pts = Array.from({length: 30}, () => ({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, v: 0.5+Math.random(), s: Math.random()*2 }));
+            pts = Array.from({length: 30}, () => ({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, v: 0.4+Math.random(), s: Math.random()*2 }));
         }
         function anim() {
             ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle = "rgba(0,255,170,0.1)";
