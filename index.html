@@ -1,327 +1,343 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dev From Zero - All-in-One</title>
-  <style>
-    :root {
-      --neon: #00ffaa;
-      --bg: #050508;
-      --glass: rgba(20, 20, 30, 0.9);
-      --text: #f0f0f0;
-      --danger: #ff4d4d;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dev From Zero - Definitive Edition</title>
+    <style>
+        :root {
+            --neon: #00ffaa;
+            --bg: #050508;
+            --glass: rgba(20, 20, 30, 0.95);
+            --text: #f0f0f0;
+            --danger: #ff4d4d;
+            --card-bg: rgba(255, 255, 255, 0.05);
+        }
 
-    body {
-      margin: 0; font-family: 'Inter', system-ui, sans-serif;
-      background: var(--bg); color: var(--text);
-      overflow-x: hidden; -webkit-font-smoothing: antialiased;
-    }
+        body {
+            margin: 0; font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg); color: var(--text);
+            overflow-x: hidden; -webkit-font-smoothing: antialiased;
+        }
 
-    #bgCanvas { position: fixed; top: 0; left: 0; z-index: -1; }
+        #bgCanvas { position: fixed; top: 0; left: 0; z-index: -1; pointer-events: none; }
 
-    .app {
-      max-width: 500px; margin: 20px auto; padding: 20px;
-      border-radius: 24px; background: var(--glass);
-      backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1);
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    }
+        .app {
+            max-width: 500px; margin: 20px auto; padding: 25px;
+            border-radius: 28px; background: var(--glass);
+            backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+        }
 
-    header { text-align: center; }
-    .logo { color: var(--neon); text-transform: uppercase; font-size: 1.5rem; margin: 0; }
+        header { text-align: center; margin-bottom: 20px; }
+        .logo { color: var(--neon); text-transform: uppercase; font-size: 1.6rem; letter-spacing: 2px; margin: 0; font-weight: 900; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 15px 0; }
+        .stat-card { background: var(--card-bg); padding: 12px; border-radius: 16px; text-align: center; border-bottom: 2px solid var(--neon); }
+        .stat-card b { display: block; font-size: 1.1rem; }
+        .stat-card small { font-size: 0.7rem; color: #888; text-transform: uppercase; }
 
-    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
-    .stat-card { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; text-align: center; font-weight: bold; font-size: 0.9rem; }
+        .xp-wrapper { margin-top: 10px; }
+        .xp-container { background: rgba(0,0,0,0.4); height: 8px; border-radius: 10px; overflow: hidden; }
+        .xp-fill { background: linear-gradient(90deg, var(--neon), #00d4ff); height: 100%; width: 0%; transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .xp-info { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 0.8rem; }
+        .badge { background: var(--neon); color: #000; padding: 2px 8px; border-radius: 6px; font-weight: bold; font-size: 0.7rem; }
 
-    .xp-container { background: rgba(0,0,0,0.3); height: 6px; border-radius: 10px; overflow: hidden; }
-    .xp-fill { background: var(--neon); height: 100%; width: 0%; transition: width 0.5s ease; }
-    .xp-info { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; font-size: 0.8rem; }
+        .tabs { display: flex; gap: 8px; margin: 20px 0; }
+        .tab-btn {
+            flex: 1; padding: 12px; border: none; border-radius: 12px;
+            background: var(--card-bg); color: #777; cursor: pointer; font-weight: bold; transition: 0.3s;
+        }
+        .tab-btn.active { background: var(--neon); color: #000; box-shadow: 0 0 15px rgba(0,255,170,0.3); }
 
-    .tabs { display: flex; gap: 8px; margin: 20px 0; }
-    .tab-btn {
-      flex: 1; padding: 10px; border: none; border-radius: 10px;
-      background: rgba(255,255,255,0.05); color: #888; cursor: pointer; font-weight: bold; transition: 0.2s;
-    }
-    .tab-btn.active { background: var(--neon); color: #000; }
+        .tab-content { display: none; animation: slideUp 0.4s ease; }
+        .tab-content.active { display: block; }
 
-    .tab-content { display: none; animation: fadeIn 0.3s ease; }
-    .tab-content.active { display: block; }
+        .points-display { text-align: center; font-size: 0.9rem; margin-bottom: 15px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 10px; }
+        .points-display strong { color: var(--neon); font-size: 1.1rem; }
 
-    .attr-card { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 14px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.03); }
-    .attr-label { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.85rem; }
-    .attr-label span { color: var(--neon); font-weight: bold; }
+        .attr-card { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 18px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); }
+        .attr-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: 600; font-size: 0.9rem; }
+        .attr-header span { color: var(--neon); }
 
-    .btn-group { display: flex; gap: 4px; }
-    .ctrl-btn { flex: 1; border: none; padding: 6px 0; border-radius: 6px; background: #252530; color: #fff; cursor: pointer; font-weight: bold; font-size: 0.75rem; }
-    .ctrl-btn:active { transform: scale(0.95); }
-    .sub { color: var(--danger); }
+        .btn-group { display: flex; gap: 5px; }
+        .ctrl-btn { flex: 1; border: none; padding: 10px 0; border-radius: 8px; background: #22222e; color: #fff; cursor: pointer; font-weight: bold; font-size: 0.8rem; }
+        .ctrl-btn:hover:not(:disabled) { background: #333345; }
+        .btn-sub { color: var(--danger); }
+        .btn-max { background: #1a3a5a; color: #99ccff; }
 
-    .main-btn { width: 100%; padding: 15px; border: none; border-radius: 12px; background: var(--neon); color: #000; font-weight: bold; cursor: pointer; margin-top: 10px; }
-    .main-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
+        .upgrade-list { display: grid; gap: 10px; }
+        .upgrade-item { 
+            background: var(--card-bg); padding: 15px; border-radius: 15px; 
+            display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .upgrade-info b { display: block; font-size: 0.9rem; }
+        .upgrade-info small { color: #888; font-size: 0.75rem; }
+        .buy-btn { background: var(--neon); border: none; padding: 10px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .buy-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
 
-    .grid-list { display: grid; gap: 8px; margin-bottom: 20px; }
-    .upgrade-card { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
-    .upgrade-card.owned { border-color: var(--neon); background: rgba(0, 255, 170, 0.05); }
+        .feed { max-height: 300px; overflow-y: auto; }
+        .log-entry { background: var(--card-bg); padding: 12px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid #444; font-size: 0.85rem; }
 
-    .feed-container { max-height: 250px; overflow-y: auto; padding-right: 5px; }
-    .review-item { background: rgba(255,255,255,0.03); padding: 10px; border-radius: 10px; margin-bottom: 8px; border-left: 3px solid #444; font-size: 0.85rem; }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        .modal-content { background: #16161e; padding: 30px; border-radius: 24px; text-align: center; border: 1px solid var(--neon); max-width: 350px; }
+        
+        .main-btn { width: 100%; padding: 18px; border: none; border-radius: 16px; background: var(--neon); color: #000; font-weight: 800; cursor: pointer; margin-top: 15px; }
+        .main-btn:disabled { background: #333; color: #777; }
 
-    .event-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; align-items: center; justify-content: center; z-index: 100; }
-    .event-content { background: #1a1a24; padding: 25px; border-radius: 20px; text-align: center; border: 1px solid var(--neon); max-width: 300px; }
-
-    .reset-btn { margin-top: 20px; background: none; border: 1px solid var(--danger); color: var(--danger); width: 100%; padding: 8px; border-radius: 8px; cursor: pointer; opacity: 0.5; font-size: 0.7rem; }
-    .reset-btn:hover { opacity: 1; background: var(--danger); color: white; }
-
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-  </style>
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .reset-link { margin-top: 20px; display: block; color: #444; font-size: 0.7rem; cursor: pointer; text-align: center; }
+    </style>
 </head>
 <body>
 
-  <canvas id="bgCanvas"></canvas>
+    <canvas id="bgCanvas"></canvas>
 
-  <div class="app">
-    <header>
-      <h1 class="logo">Dev From Zero</h1>
-      <div class="stats-grid">
-        <div class="stat-card">💰 $<span id="money">500</span></div>
-        <div class="stat-card">⭐ <span id="reputation">1.0</span></div>
-        <div class="stat-card">📈 Nível <span id="level">1</span></div>
-      </div>
-      <div class="xp-wrapper">
-        <div class="xp-container"><div id="xpBar" class="xp-fill"></div></div>
-        <div class="xp-info">
-          <small id="xpText">0 / 100 XP</small>
-          <span id="studioStatus" style="color: var(--neon); font-weight: bold;">Iniciante</span>
-        </div>
-      </div>
-    </header>
+    <div class="app">
+        <header>
+            <h1 class="logo">Dev From Zero</h1>
+            <div class="stats-grid">
+                <div class="stat-card"><small>Money</small><b>$<span id="money">0</span></b></div>
+                <div class="stat-card"><small>Rep</small><b>⭐<span id="reputation">0</span></b></div>
+                <div class="stat-card"><small>Level</small><b><span id="level">1</span></b></div>
+            </div>
+            <div class="xp-wrapper">
+                <div class="xp-container"><div id="xpBar" class="xp-fill"></div></div>
+                <div class="xp-info">
+                    <span id="xpText">0 / 0 XP</span>
+                    <span id="studioStatus" class="badge">Iniciante</span>
+                </div>
+            </div>
+        </header>
 
-    <nav class="tabs">
-      <button onclick="showTab('dev')" class="tab-btn active">🛠 Projeto</button>
-      <button onclick="showTab('office')" class="tab-btn">🏢 Empresa</button>
-      <button onclick="showTab('history')" class="tab-btn">📜 Notícias</button>
-    </nav>
+        <nav class="tabs">
+            <button onclick="showTab('dev')" class="tab-btn active" id="btn-dev">🛠 Criar</button>
+            <button onclick="showTab('office')" class="tab-btn" id="btn-office">🏢 Empresa</button>
+            <button onclick="showTab('history')" class="tab-btn" id="btn-history">📜 Feed</button>
+        </nav>
 
-    <main id="dev" class="tab-content active">
-      <div style="display:flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 10px;">
-        <span>Pontos Disponíveis:</span>
-        <strong><span id="currentPoints">0</span> / <span id="maxPoints">20</span></strong>
-      </div>
-      <div id="attrStack"></div>
-      <div id="marketTrend" style="font-size: 0.75rem; color: var(--neon); margin: 10px 0; text-align: center;">🔥 Buscando tendência...</div>
-      <button id="publishBtn" class="main-btn" onclick="publishGame()" disabled>LANÇAR JOGO</button>
-    </main>
+        <main id="dev" class="tab-content active">
+            <div class="points-display">Disponível: <strong id="currentPoints">0</strong> / <strong id="maxPoints">0</strong></div>
+            <div id="attrContainer"></div>
+            <div id="marketTrend" style="text-align:center; font-size: 0.8rem; color: var(--neon); margin: 10px 0;">🔥 Tendência: ...</div>
+            <button id="publishBtn" class="main-btn" onclick="publishGame()" disabled>LANÇAR NOVO JOGO</button>
+        </main>
 
-    <main id="office" class="tab-content">
-      <h4 style="margin: 0 0 10px 0; color: var(--neon);">🔬 Tecnologias</h4>
-      <div id="techTree" class="grid-list"></div>
-      <h4 style="margin: 15px 0 10px 0; color: var(--neon);">👥 Equipe</h4>
-      <div id="staffList" class="grid-list"></div>
-      <button onclick="resetGame()" class="reset-btn">Zerar Todo o Progresso</button>
-    </main>
+        <main id="office" class="tab-content">
+            <h4 style="margin: 0 0 10px 0; color: var(--neon);">🔬 Tecnologias</h4>
+            <div id="techList" class="upgrade-list"></div>
+            <h4 style="margin: 20px 0 10px 0; color: var(--neon);">👥 Equipe</h4>
+            <div id="staffList" class="upgrade-list"></div>
+            <span class="reset-link" onclick="resetGame()">Resetar Progresso</span>
+        </main>
 
-    <main id="history" class="tab-content">
-      <div id="gameLog" class="feed-container"></div>
-    </main>
-  </div>
-
-  <div id="eventOverlay" class="event-modal" style="display:none;">
-    <div class="event-content">
-      <h3 id="eventTitle" style="color: var(--neon); margin-top: 0;">Evento!</h3>
-      <p id="eventDesc" style="font-size: 0.9rem; line-height: 1.4;"></p>
-      <button onclick="closeEvent()" class="main-btn">OK</button>
+        <main id="history" class="tab-content">
+            <div id="gameLog" class="feed"></div>
+        </main>
     </div>
-  </div>
 
-  <script>
-    // --- ESTADO DO JOGO ---
-    let game = {
-      money: 500, reputation: 1.0, level: 1, xp: 0, xpNeeded: 100, trend: "gameplay",
-      staff: [], techs: [],
-      stats: { gameplay: 0, graphics: 0, optimization: 0, story: 0, marketing: 0 }
-    };
-
-    const statusNames = { 1: "Dev de Quarto", 10: "Freelancer", 25: "Micro Estúdio", 50: "Estúdio Indie", 100: "Lenda" };
-    const techData = [
-      { id: "engine", name: "Engine Própria", cost: 1200, desc: "Otimização 30% mais fácil" },
-      { id: "graphics3d", name: "Gráficos 3D", cost: 3500, desc: "Dobra valor de Gráficos" }
-    ];
-    const staffData = [
-      { id: "dev", name: "Dev Senior", cost: 2000, salary: 150, type: "optimization", power: 30 },
-      { id: "art", name: "Artista Pro", cost: 1500, salary: 100, type: "graphics", power: 25 }
-    ];
-
-    // --- NAVEGAÇÃO ---
-    function showTab(id) {
-      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-      event.currentTarget.classList.add('active');
-    }
-
-    // --- ATRIBUTOS ---
-    function renderAttributes() {
-      const container = document.getElementById('attrStack');
-      const keys = ["gameplay", "graphics", "story", "optimization"];
-      if(game.level >= 5) keys.push("marketing");
-      
-      container.innerHTML = keys.map(key => `
-        <div class="attr-card">
-          <div class="attr-label">${key.toUpperCase()} <span id="val-${key}">${game.stats[key]}</span></div>
-          <div class="btn-group">
-            <button class="ctrl-btn sub" onclick="changeAttr('${key}', -5)">-5</button>
-            <button class="ctrl-btn" onclick="changeAttr('${key}', 1)">+1</button>
-            <button class="ctrl-btn" onclick="changeAttr('${key}', 5)">+5</button>
-            <button class="ctrl-btn" onclick="addMax('${key}')">MAX</button>
-          </div>
+    <div id="eventModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h2 id="evTitle" style="color: var(--neon);">Evento!</h2>
+            <p id="evDesc"></p>
+            <button onclick="closeEvent()" class="main-btn">OK</button>
         </div>
-      `).join('');
-    }
+    </div>
 
-    function changeAttr(id, amt) {
-      const max = 20 + (game.level * 5);
-      const current = Object.values(game.stats).reduce((a, b) => a + b, 0);
-      let newVal = Math.max(0, game.stats[id] + amt);
-      if(amt > 0 && (current + amt) > max) newVal = game.stats[id] + (max - current);
-      game.stats[id] = newVal;
-      updateUI();
-    }
+    <script>
+        let game = {
+            money: 500, reputation: 1.0, level: 1, xp: 0, xpNeeded: 100,
+            trend: "gameplay", unlockedTechs: [], hiredStaff: [],
+            stats: { gameplay: 0, graphics: 0, story: 0, optimization: 0, marketing: 0 }
+        };
 
-    function addMax(id) {
-      const max = 20 + (game.level * 5);
-      const current = Object.values(game.stats).reduce((a, b) => a + b, 0);
-      game.stats[id] += (max - current);
-      updateUI();
-    }
+        const TECHS = [
+            { id: "engine", name: "Custom Engine", cost: 1500, desc: "Otimização 40% mais eficiente" },
+            { id: "graphics3d", name: "Gráficos 3D", cost: 4500, desc: "Bônus massivo em visual" }
+        ];
 
-    // --- MECÂNICA DE JOGO ---
-    function publishGame() {
-      let { gameplay: gp, graphics: gr, story: st, optimization: ot, marketing: mk } = game.stats;
-      
-      // Bônus Equipe e Tech
-      game.staff.forEach(s => { if(s.type === 'optimization') ot += s.power; if(s.type === 'graphics') gr += s.power; });
-      if(game.techs.includes('graphics3d')) gr *= 2;
+        const STAFF = [
+            { id: "dev_senior", name: "Dev Senior", cost: 2000, salary: 150, type: "optimization", power: 30 },
+            { id: "artist_pro", name: "Artista Pro", cost: 1800, salary: 100, type: "graphics", power: 25 },
+            { id: "marketer", name: "Marketer", cost: 3000, salary: 250, type: "marketing", power: 40 }
+        ];
 
-      let scoreBase = (gp * 3) + (gr * 1.5) + (st * 1.5);
-      if(game.trend === "gameplay") scoreBase *= 1.4;
+        const EVENTS = [
+          { t: "Viral!", d: "Seu jogo virou meme positivo!", a: () => { game.money += 800; game.reputation += 0.3; } },
+          { t: "Processo", d: "Problemas com direitos autorais.", a: () => { game.money -= 400; } },
+          { t: "Hacker", d: "Um fã limpou os bugs do seu código!", a: () => { game.reputation += 0.5; } }
+        ];
 
-      const bugChance = (gp + gr + st) * 0.2;
-      const otFinal = game.techs.includes('engine') ? ot * 1.4 : ot;
-      const penalty = otFinal < bugChance ? 0.6 : 1.0;
+        function showTab(id) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.getElementById('btn-'+id).classList.add('active');
+        }
 
-      const note = Math.min(10, (scoreBase / ((20 + game.level * 5) * 1.5)) * 10 * penalty).toFixed(1);
-      const profit = Math.floor(note * 100 * game.reputation * (1 + mk/15));
+        function calculateMaxPoints() { return 20 + (game.level * 5); }
 
-      game.money += profit;
-      game.reputation += note >= 8 ? 0.2 : (note < 4 ? -0.2 : 0.05);
-      gainXP(Math.floor(note * 25));
-      addLog(note, profit, penalty < 1.0);
-      
-      game.stats = { gameplay: 0, graphics: 0, optimization: 0, story: 0, marketing: 0 };
-      randomizeTrend();
-      saveGame();
-      updateUI();
-    }
+        function updateUI() {
+            document.getElementById('money').innerText = Math.floor(game.money);
+            document.getElementById('reputation').innerText = game.reputation.toFixed(1);
+            document.getElementById('level').innerText = game.level;
+            document.getElementById('xpBar').style.width = (game.xp / game.xpNeeded * 100) + "%";
+            document.getElementById('xpText').innerText = `${game.xp}/${game.xpNeeded} XP`;
+            
+            const current = Object.values(game.stats).reduce((a, b) => a + b, 0);
+            const max = calculateMaxPoints();
+            document.getElementById('currentPoints').innerText = current;
+            document.getElementById('maxPoints').innerText = max;
+            document.getElementById('publishBtn').disabled = (current === 0);
 
-    function buyTech(id, cost) {
-      if(game.money >= cost) { game.money -= cost; game.techs.push(id); updateUI(); saveGame(); }
-    }
+            const statusStages = { 1: "Iniciante", 10: "Indie", 30: "Estúdio", 60: "Império", 100: "Lenda" };
+            let title = "Novato";
+            for(let l in statusStages) if(game.level >= l) title = statusStages[l];
+            document.getElementById('studioStatus').innerText = title;
 
-    function hireStaff(id) {
-      const s = staffData.find(x => x.id === id);
-      if(game.money >= s.cost) { game.money -= s.cost; game.staff.push(s); updateUI(); saveGame(); }
-    }
+            renderAttributes();
+            renderShop();
+        }
 
-    // --- AUXILIARES ---
-    function gainXP(amt) {
-      game.xp += amt;
-      while(game.xp >= game.xpNeeded && game.level < 100) {
-        game.xp -= game.xpNeeded; game.level++; game.xpNeeded = Math.floor(game.xpNeeded * 1.3);
-      }
-    }
+        function renderAttributes() {
+            const container = document.getElementById('attrContainer');
+            const keys = ["gameplay", "graphics", "story", "optimization"];
+            if(game.level >= 5) keys.push("marketing");
+            container.innerHTML = keys.map(key => `
+                <div class="attr-card">
+                    <div class="attr-header">${key.toUpperCase()} <span>${game.stats[key]}</span></div>
+                    <div class="btn-group">
+                        <button class="ctrl-btn btn-sub" onclick="modifyAttr('${key}', -5)">-5</button>
+                        <button class="ctrl-btn" onclick="modifyAttr('${key}', 1)">+1</button>
+                        <button class="ctrl-btn" onclick="modifyAttr('${key}', 5)">+5</button>
+                        <button class="ctrl-btn btn-max" onclick="maxAttr('${key}')">MAX</button>
+                    </div>
+                </div>
+            `).join('');
+        }
 
-    function addLog(n, p, b) {
-      const log = document.getElementById('gameLog');
-      const d = document.createElement('div');
-      d.className = "review-item";
-      d.style.borderLeftColor = n >= 7 ? "var(--neon)" : (n >= 4 ? "#ffaa00" : "var(--danger)");
-      d.innerHTML = `<strong>Review: ${n}/10</strong> | Lucro: $${p}<br><small>${b ? "⚠️ Muitos bugs reclamados!" : "💎 Jogo muito polido."}</small>`;
-      log.prepend(d);
-    }
+        function modifyAttr(key, amt) {
+            const current = Object.values(game.stats).reduce((a, b) => a + b, 0);
+            const max = calculateMaxPoints();
+            let newVal = Math.max(0, game.stats[key] + amt);
+            if(amt > 0 && (current + amt) > max) newVal = game.stats[key] + (max - current);
+            game.stats[key] = newVal;
+            updateUI();
+        }
 
-    function randomizeTrend() {
-      const trends = ["gameplay", "graphics", "story"];
-      game.trend = trends[Math.floor(Math.random() * trends.length)];
-      document.getElementById('marketTrend').textContent = `🔥 TENDÊNCIA ATUAL: ${game.trend.toUpperCase()}`;
-    }
+        function maxAttr(key) {
+            const current = Object.values(game.stats).reduce((a, b) => a + b, 0);
+            game.stats[key] += (calculateMaxPoints() - current);
+            updateUI();
+        }
 
-    // --- SAVE / UI ---
-    function saveGame() { localStorage.setItem('devZeroFinal', JSON.stringify(game)); }
-    function loadGame() {
-      const saved = localStorage.getItem('devZeroFinal');
-      if(saved) { game = JSON.parse(saved); updateUI(); }
-    }
-    function resetGame() { if(confirm("Apagar tudo?")) { localStorage.clear(); location.reload(); } }
+        function publishGame() {
+            let { gameplay:gp, graphics:gr, story:st, optimization:ot, marketing:mk } = game.stats;
 
-    function updateUI() {
-      document.getElementById('money').textContent = Math.floor(game.money);
-      document.getElementById('reputation').textContent = game.reputation.toFixed(1);
-      document.getElementById('level').textContent = game.level;
-      document.getElementById('xpBar').style.width = `${(game.xp/game.xpNeeded)*100}%`;
-      document.getElementById('xpText').textContent = `${game.xp}/${game.xpNeeded} XP`;
-      
-      const current = Object.values(game.stats).reduce((a, b) => a + b, 0);
-      const max = 20 + (game.level * 5);
-      document.getElementById('currentPoints').textContent = current;
-      document.getElementById('maxPoints').textContent = max;
-      document.getElementById('publishBtn').disabled = current === 0;
+            // Bônus Staff/Tech
+            game.hiredStaff.forEach(sid => {
+                const s = STAFF.find(x => x.id === sid);
+                if(s.type === 'optimization') ot += s.power;
+                if(s.type === 'graphics') gr += s.power;
+                if(s.type === 'marketing') mk += s.power;
+            });
+            if(game.unlockedTechs.includes('engine')) ot *= 1.4;
+            if(game.unlockedTechs.includes('graphics3d')) gr *= 2.0;
 
-      let st = "Iniciante";
-      for(let l in statusNames) if(game.level >= l) st = statusNames[l];
-      document.getElementById('studioStatus').textContent = st;
+            let score = (gp * 3.5) + (gr * 1.5) + (st * 1.2);
+            if(game.trend === "gameplay") score *= 1.3;
 
-      renderAttributes();
-      renderShop();
-    }
+            const bugPenalty = ot < (gp + gr) * 0.2 ? 0.6 : 1.0;
+            const note = Math.min(10, (score / (calculateMaxPoints() * 1.8)) * 10 * bugPenalty).toFixed(1);
+            const profit = Math.floor(note * 120 * game.reputation * (1 + mk/30));
 
-    function renderShop() {
-      document.getElementById('techTree').innerHTML = techData.map(t => `
-        <div class="upgrade-card ${game.techs.includes(t.id) ? 'owned' : ''}">
-          <span style="font-size: 0.8rem;"><strong>${t.name}</strong><br><small>${t.desc}</small></span>
-          <button onclick="buyTech('${t.id}', ${t.cost})" class="ctrl-btn" ${game.techs.includes(t.id)?'disabled':''}>$${t.cost}</button>
-        </div>`).join('');
+            game.money += profit;
+            game.reputation += note >= 8 ? 0.2 : (note < 4 ? -0.2 : 0.05);
+            gainXP(Math.floor(note * 35));
+            addLog(note, profit, bugPenalty < 1.0);
 
-      document.getElementById('staffList').innerHTML = staffData.map(s => `
-        <div class="upgrade-card ${game.staff.find(x=>x.id===s.id) ? 'owned' : ''}">
-          <span style="font-size: 0.8rem;"><strong>${s.name}</strong><br><small>Salário: $${s.salary}</small></span>
-          <button onclick="hireStaff('${s.id}')" class="ctrl-btn" ${game.staff.find(x=>x.id===s.id)?'disabled':''}>$${s.cost}</button>
-        </div>`).join('');
-    }
+            if(Math.random() < 0.25) triggerEvent();
+            game.stats = { gameplay: 0, graphics: 0, story: 0, optimization: 0, marketing: 0 };
+            randomizeTrend();
+            saveGame();
+            updateUI();
+        }
 
-    // --- CANVAS ---
-    const canvas = document.getElementById('bgCanvas');
-    const ctx = canvas.getContext('2d');
-    let particles = [];
-    function initCanvas() {
-      canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-      particles = Array.from({length: 40}, () => ({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, s: Math.random()*2, v: 0.5 + Math.random() }));
-    }
-    function animate() {
-      ctx.clearRect(0,0,canvas.width, canvas.height);
-      ctx.fillStyle = "#00ffaa11";
-      particles.forEach(p => { p.y -= p.v; if(p.y < 0) p.y = canvas.height; ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill(); });
-      requestAnimationFrame(animate);
-    }
+        function addLog(n, p, b) {
+            const div = document.createElement('div');
+            div.className = "log-entry";
+            div.style.borderLeftColor = n >= 7 ? "var(--neon)" : "#ff4d4d";
+            div.innerHTML = `<b>Nota: ${n}/10</b> | Lucro: $${p}<br><small>${b ? '❌ Cheio de bugs' : '💎 Estável'}</small>`;
+            document.getElementById('gameLog').prepend(div);
+        }
 
-    // Salários (20s)
-    setInterval(() => {
-      const sal = game.staff.reduce((a, b) => a + b.salary, 0);
-      if(sal > 0) { game.money = Math.max(0, game.money - sal); updateUI(); saveGame(); }
-    }, 20000);
+        function gainXP(amt) {
+            game.xp += amt;
+            while(game.xp >= game.xpNeeded) {
+                game.xp -= game.xpNeeded; game.level++; game.xpNeeded = Math.floor(game.xpNeeded * 1.3);
+            }
+        }
 
-    window.onload = () => { loadGame(); initCanvas(); animate(); randomizeTrend(); updateUI(); };
-    window.onresize = initCanvas;
-  </script>
+        function triggerEvent() {
+            const ev = EVENTS[Math.floor(Math.random()*EVENTS.length)];
+            document.getElementById('evTitle').innerText = ev.t;
+            document.getElementById('evDesc').innerText = ev.d;
+            document.getElementById('eventModal').style.display = 'flex';
+            ev.a();
+        }
+
+        function closeEvent() { document.getElementById('eventModal').style.display = 'none'; updateUI(); saveGame(); }
+
+        function renderShop() {
+            document.getElementById('techList').innerHTML = TECHS.map(t => `
+                <div class="upgrade-item ${game.unlockedTechs.includes(t.id)?'owned':''}">
+                    <div class="upgrade-info"><b>${t.name}</b><small>${t.desc}</small></div>
+                    <button class="buy-btn" onclick="buyTech('${t.id}',${t.cost})" ${game.unlockedTechs.includes(t.id)?'disabled':''}>$${t.cost}</button>
+                </div>`).join('');
+            document.getElementById('staffList').innerHTML = STAFF.map(s => `
+                <div class="upgrade-item ${game.hiredStaff.includes(s.id)?'owned':''}">
+                    <div class="upgrade-info"><b>${s.name}</b><small>Salário: $${s.salary}</small></div>
+                    <button class="buy-btn" onclick="hireStaff('${s.id}',${s.cost})" ${game.hiredStaff.includes(s.id)?'disabled':''}>$${s.cost}</button>
+                </div>`).join('');
+        }
+
+        function buyTech(id, c) { if(game.money >= c) { game.money -= c; game.unlockedTechs.push(id); updateUI(); saveGame(); } }
+        function hireStaff(id, c) { if(game.money >= c) { game.money -= c; game.hiredStaff.push(id); updateUI(); saveGame(); } }
+
+        function randomizeTrend() {
+            const tr = ["gameplay", "graphics", "story"];
+            game.trend = tr[Math.floor(Math.random()*tr.length)];
+            document.getElementById('marketTrend').innerText = `🔥 TENDÊNCIA: ${game.trend.toUpperCase()}`;
+        }
+
+        function saveGame() { localStorage.setItem('DevZero_Definitive', JSON.stringify(game)); }
+        function loadGame() {
+            const s = localStorage.getItem('DevZero_Definitive');
+            if(s) { game = JSON.parse(s); updateUI(); }
+        }
+        function resetGame() { if(confirm("Resetar?")) { localStorage.clear(); location.reload(); } }
+
+        // Salários (30s)
+        setInterval(() => {
+            let s = 0; game.hiredStaff.forEach(id => s += STAFF.find(x=>x.id===id).salary);
+            if(s > 0) { game.money = Math.max(0, game.money - s); updateUI(); saveGame(); }
+        }, 30000);
+
+        // Fundo
+        const canvas = document.getElementById('bgCanvas'); const ctx = canvas.getContext('2d');
+        let pts = [];
+        function initC() {
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            pts = Array.from({length: 40}, () => ({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, v: 0.5+Math.random(), s: Math.random()*2 }));
+        }
+        function anim() {
+            ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle = "rgba(0,255,170,0.1)";
+            pts.forEach(p => { p.y -= p.v; if(p.y < 0) p.y = canvas.height; ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill(); });
+            requestAnimationFrame(anim);
+        }
+
+        window.onload = () => { loadGame(); initC(); anim(); randomizeTrend(); updateUI(); };
+    </script>
 </body>
 </html>
