@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dev From Zero - Level 50 Edition</title>
+    <title>Dev From Zero - Definitive S50</title>
     <style>
         :root {
             --neon: #00ffaa;
-            --bg: #050508;
-            --glass: rgba(20, 20, 30, 0.95);
-            --text: #f0f0f0;
-            --danger: #ff4d4d;
-            --card-bg: rgba(255, 255, 255, 0.05);
+            --neon-glow: rgba(0, 255, 170, 0.4);
+            --bg: #0a0a0f;
+            --glass: rgba(20, 20, 35, 0.85);
+            --text: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --danger: #ff4d6d;
         }
 
         body {
@@ -20,117 +21,138 @@
             overflow-x: hidden;
         }
 
-        #bgCanvas { position: fixed; top: 0; left: 0; z-index: -1; pointer-events: none; }
+        #bgCanvas { position: fixed; top: 0; left: 0; z-index: -1; }
 
         .app {
-            max-width: 500px; margin: 20px auto; padding: 25px;
-            border-radius: 28px; background: var(--glass);
-            backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+            max-width: 480px; margin: 20px auto; padding: 25px;
+            border-radius: 32px; background: var(--glass);
+            backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
-        header { text-align: center; margin-bottom: 20px; }
-        .logo { color: var(--neon); text-transform: uppercase; font-size: 1.6rem; margin: 0; font-weight: 900; }
+        .logo { 
+            font-size: 1.8rem; font-weight: 900; text-align: center;
+            background: linear-gradient(to right, #00ffaa, #00d4ff);
+            -webkit-background-clip: text;
+            background-clip: text; /* Correção do erro 1 */
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px; margin-bottom: 20px;
+        }
         
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 15px 0; }
-        .stat-card { background: var(--card-bg); padding: 12px; border-radius: 16px; text-align: center; border-bottom: 2px solid var(--neon); }
-        .stat-card b { display: block; font-size: 1.1rem; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .stat-card { 
+            background: var(--card-bg); padding: 12px 5px; border-radius: 18px; 
+            text-align: center; border: 1px solid rgba(255,255,255,0.05);
+        }
+        .stat-card b { font-size: 1.1rem; color: var(--neon); text-shadow: 0 0 10px var(--neon-glow); }
+        .stat-card small { display: block; font-size: 0.65rem; color: #888; text-transform: uppercase; }
 
-        .xp-container { background: rgba(0,0,0,0.4); height: 8px; border-radius: 10px; overflow: hidden; margin-top: 10px;}
-        .xp-fill { background: linear-gradient(90deg, var(--neon), #00d4ff); height: 100%; width: 0%; transition: width 0.5s ease; }
+        .xp-wrapper { margin: 15px 0; }
+        .xp-container { background: rgba(0,0,0,0.5); height: 6px; border-radius: 10px; overflow: hidden; }
+        .xp-fill { background: linear-gradient(90deg, #00ffaa, #0088ff); height: 100%; width: 0%; transition: width 0.6s ease; }
 
-        .tabs { display: flex; gap: 8px; margin: 20px 0; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 25px; }
         .tab-btn {
-            flex: 1; padding: 12px; border: none; border-radius: 12px;
-            background: var(--card-bg); color: #777; cursor: pointer; font-weight: bold;
+            flex: 1; padding: 12px; border: none; border-radius: 14px;
+            background: rgba(255,255,255,0.05); color: #888; 
+            cursor: pointer; font-weight: bold; transition: 0.3s;
         }
-        .tab-btn.active { background: var(--neon); color: #000; }
+        .tab-btn.active { background: var(--neon); color: #000; box-shadow: 0 4px 15px var(--neon-glow); }
 
-        .tab-content { display: none; animation: slideUp 0.4s ease; }
-        .tab-content.active { display: block; }
+        /* BOTOES COM TEXTURA CORRIGIDOS */
+        .ctrl-btn { 
+            flex: 1; border: none; padding: 12px; border-radius: 12px;
+            background: linear-gradient(145deg, #1e1e2e, #14141f);
+            color: #fff; cursor: pointer; font-weight: bold;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.2s; box-shadow: 0 4px 0 #000;
+        }
+        .ctrl-btn:hover { background: #252538; transform: translateY(-1px); }
+        .ctrl-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #000; }
+        
+        .btn-plus { color: var(--neon); }
+        .btn-sub { color: var(--danger); }
 
-        /* UPGRADES */
-        .level-header { background: rgba(0,255,170,0.1); padding: 10px; border-radius: 10px; text-align: center; margin-bottom: 15px; border: 1px dashed var(--neon); }
+        .main-btn { 
+            width: 100%; padding: 20px; border: none; border-radius: 18px;
+            background: linear-gradient(135deg, #00ffaa 0%, #00cc88 100%);
+            color: #003322; font-weight: 900; font-size: 1rem; cursor: pointer;
+            box-shadow: 0 6px 20px var(--neon-glow); transition: all 0.3s;
+            text-transform: uppercase;
+        }
+        .main-btn:hover:not(:disabled) { transform: scale(1.02); filter: brightness(1.1); /* Correção do erro 2 */ }
+        .main-btn:disabled { background: #333; color: #666; box-shadow: none; cursor: not-allowed; }
+
         .upgrade-item { 
-            background: var(--card-bg); padding: 15px; border-radius: 15px; 
+            background: rgba(255,255,255,0.02); padding: 15px; border-radius: 20px; 
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05);
         }
-        .locked { opacity: 0.3; filter: grayscale(1); }
-        .owned { border-color: var(--neon); background: rgba(0,255,170,0.08); }
-        
-        .lvl-badge { background: #333; color: var(--neon); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; }
-        .bonus-tag { font-size: 0.65rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.5px; }
-        
-        .buy-btn { background: var(--neon); border: none; padding: 10px 14px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        .buy-btn:disabled { background: #444; color: #888; cursor: not-allowed; }
+        .upgrade-item.owned { border-color: var(--neon); background: rgba(0, 255, 170, 0.05); }
+        .buy-btn { background: #fff; color: #000; border: none; padding: 10px 16px; border-radius: 12px; font-weight: 800; cursor: pointer; }
+        .buy-btn:disabled { background: #222; color: #555; }
 
-        .feed { max-height: 250px; overflow-y: auto; }
-        .log-entry { background: var(--card-bg); padding: 12px; border-radius: 12px; margin-bottom: 8px; border-left: 4px solid var(--neon); font-size: 0.8rem; }
+        .attr-card { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 20px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.03); }
+        .attr-header { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.8rem; font-weight: bold; color: #aaa; }
+        .attr-header span { color: var(--neon); font-size: 1rem; }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .log-entry { background: var(--card-bg); padding: 12px; border-radius: 14px; margin-bottom: 8px; border-left: 3px solid var(--neon); font-size: 0.8rem; }
     </style>
 </head>
 <body>
-
     <canvas id="bgCanvas"></canvas>
-
     <div class="app">
         <header>
-            <h1 class="logo">Dev From Zero</h1>
+            <div class="logo">DEV FROM ZERO</div>
             <div class="stats-grid">
                 <div class="stat-card"><small>Grana</small><b>$<span id="money">0</span></b></div>
-                <div class="stat-card"><small>Rep</small><b>⭐<span id="reputation">0</span></b></div>
-                <div class="stat-card"><small>Level</small><b><span id="level">1</span>/50</b></div>
+                <div class="stat-card"><small>⭐ Rep</small><b><span id="reputation">0</span></b></div>
+                <div class="stat-card"><small>Level</small><b><span id="level">1</span></b></div>
             </div>
-            <div class="xp-container"><div id="xpBar" class="xp-fill"></div></div>
+            <div class="xp-wrapper">
+                <div class="xp-container"><div id="xpBar" class="xp-fill"></div></div>
+            </div>
         </header>
 
         <nav class="tabs">
-            <button onclick="showTab('dev')" class="tab-btn active" id="btn-dev">🛠 Projeto</button>
-            <button onclick="showTab('office')" class="tab-btn" id="btn-office">🏢 Upgrades</button>
-            <button onclick="showTab('history')" class="tab-btn" id="btn-history">📜 Feed</button>
+            <button onclick="showTab('dev')" class="tab-btn active" id="btn-dev">PROJETO</button>
+            <button onclick="showTab('office')" class="tab-btn" id="btn-office">ESTÚDIO</button>
+            <button onclick="showTab('history')" class="tab-btn" id="btn-history">FEED</button>
         </nav>
 
         <main id="dev" class="tab-content active">
-            <div style="text-align: center; font-size: 0.85rem; margin-bottom: 15px; color: #aaa;">
-                Capacidade de Pontos: <strong id="currentPoints" style="color:var(--neon)">0</strong> / <strong id="maxPoints">0</strong>
+            <div style="text-align: center; font-size: 0.75rem; color: #777; margin-bottom: 15px;">
+                CAPACIDADE: <strong id="currentPoints" style="color:var(--neon)">0</strong> / <strong id="maxPoints">0</strong>
             </div>
             <div id="attrContainer"></div>
-            <button id="publishBtn" style="width:100%; padding:18px; border-radius:15px; border:none; background:var(--neon); font-weight:900; cursor:pointer; margin-top:10px;" onclick="publishGame()" disabled>LANÇAR JOGO</button>
+            <button id="publishBtn" class="main-btn" onclick="publishGame()" disabled style="margin-top: 10px;">Lançar Jogo</button>
         </main>
 
         <main id="office" class="tab-content">
-            <div class="level-header">Seu Nível: <strong id="currentLvlDisplay">1</strong></div>
             <div id="upgradeList"></div>
-            <center><small onclick="resetGame()" style="cursor:pointer; opacity:0.2; display:block; margin: 20px;">Resetar Save</small></center>
+            <center><small onclick="resetGame()" style="cursor:pointer; color: #444; margin-top: 20px; display: block;">Resetar Save</small></center>
         </main>
 
         <main id="history" class="tab-content">
-            <div id="gameLog" class="feed"></div>
+            <div id="gameLog" style="max-height: 300px; overflow-y: auto;"></div>
         </main>
     </div>
 
     <script>
+        // AUTO-SAVE SYSTEM INTEGRADO
         let game = {
             money: 500, reputation: 1.0, level: 1, xp: 0, xpNeeded: 100,
             inventory: [],
             stats: { gameplay: 0, graphics: 0, story: 0, optimization: 0 }
         };
 
-        // LISTA DE UPGRADES ATÉ O NÍVEL 50
         const UPGRADES = [
-            { id: "desk", name: "Cadeira Gamer", cost: 400, level: 2, bonus: "points", val: 5, desc: "+5 Pontos de capacidade" },
-            { id: "course", name: "Curso Online", cost: 900, level: 4, bonus: "xp", val: 1.2, desc: "+20% Ganho de XP" },
-            { id: "coffee", name: "Cafeteira Pro", cost: 1500, level: 6, bonus: "points", val: 10, desc: "+10 Pontos de capacidade" },
-            { id: "ads", name: "Anúncios Básicos", cost: 2500, level: 8, bonus: "money", val: 1.3, desc: "+30% Lucro nos jogos" },
-            { id: "pc_mid", name: "PC Intermediário", cost: 4500, level: 12, bonus: "points", val: 20, desc: "+20 Pontos de capacidade" },
-            { id: "junior", name: "Dev Junior", cost: 8000, level: 15, bonus: "xp", val: 1.5, desc: "+50% Ganho de XP" },
-            { id: "engine", name: "Engine 3D", cost: 15000, level: 20, bonus: "money", val: 1.8, desc: "+80% Lucro nos jogos" },
-            { id: "setup", name: "Setup Dual-Monitor", cost: 25000, level: 25, bonus: "points", val: 40, desc: "+40 Pontos de capacidade" },
-            { id: "office", name: "Pequeno Escritório", cost: 50000, level: 30, bonus: "money", val: 2.5, desc: "2.5x Mais lucro" },
-            { id: "senior", name: "Dev Senior", cost: 120000, level: 40, bonus: "xp", val: 2.5, desc: "2.5x Mais Experiência" },
-            { id: "legend", name: "Sede Global", cost: 500000, level: 50, bonus: "money", val: 5.0, desc: "5x Lucro (Nível Máximo)" }
+            { id: "desk", name: "Cadeira Gamer", cost: 350, level: 2, bonus: "points", val: 5, desc: "+5 Capacidade" },
+            { id: "course", name: "Curso XP", cost: 800, level: 4, bonus: "xp", val: 1.3, desc: "+30% Exp" },
+            { id: "pc_mid", name: "PC Gamer", cost: 3000, level: 10, bonus: "points", val: 25, desc: "+25 Capacidade" },
+            { id: "ads", name: "Marketing", cost: 6000, level: 15, bonus: "money", val: 1.5, desc: "+50% Lucro" },
+            { id: "office", name: "Escritório", cost: 40000, level: 30, bonus: "money", val: 3.0, desc: "3x Lucro" },
+            { id: "legend", name: "Prédio Global", cost: 200000, level: 50, bonus: "money", val: 6.0, desc: "6x Lucro" }
         ];
 
         function showTab(id) {
@@ -141,16 +163,14 @@
         }
 
         function updateUI() {
-            document.getElementById('money').innerText = Math.floor(game.money);
+            document.getElementById('money').innerText = Math.floor(game.money).toLocaleString();
             document.getElementById('reputation').innerText = game.reputation.toFixed(1);
             document.getElementById('level').innerText = game.level;
-            document.getElementById('currentLvlDisplay').innerText = game.level;
             document.getElementById('xpBar').style.width = (game.xp / game.xpNeeded * 100) + "%";
 
-            // Cálculo dinâmico de Capacidade Máxima
-            let bonusPoints = 0;
-            UPGRADES.filter(u => u.bonus === "points" && game.inventory.includes(u.id)).forEach(u => bonusPoints += u.val);
-            const max = 20 + (game.level * 5) + bonusPoints;
+            let bPoints = 0;
+            UPGRADES.filter(u => u.bonus === "points" && game.inventory.includes(u.id)).forEach(u => bPoints += u.val);
+            const max = 20 + (game.level * 5) + bPoints;
             const current = Object.values(game.stats).reduce((a, b) => a + b, 0);
 
             document.getElementById('currentPoints').innerText = current;
@@ -159,6 +179,7 @@
 
             renderAttributes(max, current);
             renderUpgradeTab();
+            localStorage.setItem('DevZero_Save', JSON.stringify(game)); // Auto-save
         }
 
         function renderAttributes(max, current) {
@@ -167,19 +188,18 @@
                 <div class="attr-card">
                     <div class="attr-header">${key.toUpperCase()} <span>${game.stats[key]}</span></div>
                     <div class="btn-group">
-                        <button class="ctrl-btn" onclick="modifyAttr('${key}', 1, ${max}, ${current})">+1</button>
-                        <button class="ctrl-btn" onclick="modifyAttr('${key}', 5, ${max}, ${current})">+5</button>
-                        <button class="ctrl-btn" onclick="modifyAttr('${key}', 10, ${max}, ${current})">+10</button>
+                        <button class="ctrl-btn btn-sub" onclick="modifyAttr('${key}', -1, ${max}, ${current})">-1</button>
+                        <button class="ctrl-btn btn-plus" onclick="modifyAttr('${key}', 1, ${max}, ${current})">+1</button>
+                        <button class="ctrl-btn btn-plus" onclick="modifyAttr('${key}', 5, ${max}, ${current})">+5</button>
                     </div>
                 </div>
             `).join('');
         }
 
         function modifyAttr(key, amt, max, current) {
-            if (current + amt <= max) {
-                game.stats[key] += amt;
-                updateUI();
-            }
+            if (amt > 0) { if (current + amt <= max) game.stats[key] += amt; } 
+            else { game.stats[key] = Math.max(0, game.stats[key] + amt); }
+            updateUI();
         }
 
         function renderUpgradeTab() {
@@ -190,90 +210,70 @@
                 return `
                 <div class="upgrade-item ${isLocked ? 'locked' : ''} ${isOwned ? 'owned' : ''}">
                     <div>
-                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-                            <span class="lvl-badge">LVL ${u.level}</span>
-                            <b style="font-size:0.9rem">${u.name}</b>
-                        </div>
-                        <span class="bonus-tag">${u.desc}</span>
+                        <small style="color:var(--neon)">NV ${u.level}</small>
+                        <div style="font-weight:bold; font-size:0.9rem">${u.name}</div>
+                        <div style="font-size:0.7rem; color: #666">${u.desc}</div>
                     </div>
                     <button class="buy-btn" onclick="buyItem('${u.id}', ${u.cost})" ${(isLocked || isOwned) ? 'disabled' : ''}>
-                        ${isOwned ? '✓' : '$' + u.cost}
+                        ${isOwned ? '✓' : '$'+u.cost}
                     </button>
                 </div>`;
             }).join('');
         }
 
         function buyItem(id, cost) {
-            if (game.money >= cost) {
-                game.money -= cost;
-                game.inventory.push(id);
-                updateUI();
-                saveGame();
-            }
+            if (game.money >= cost) { game.money -= cost; game.inventory.push(id); updateUI(); }
         }
 
         function publishGame() {
-            const totalPoints = Object.values(game.stats).reduce((a, b) => a + b, 0);
-            const note = Math.min(10, (totalPoints / (20 + game.level * 4) * 10)).toFixed(1);
+            const total = Object.values(game.stats).reduce((a, b) => a + b, 0);
+            const note = Math.min(10, (total / (20 + game.level * 4.5) * 10)).toFixed(1);
+            let mMult = 1.0;
+            UPGRADES.filter(u => u.bonus === "money" && game.inventory.includes(u.id)).forEach(u => mMult = u.val);
+            const profit = Math.floor(note * 180 * game.reputation * mMult);
             
-            // Aplicar Bônus de Dinheiro dos Upgrades
-            let moneyMult = 1.0;
-            UPGRADES.filter(u => u.bonus === "money" && game.inventory.includes(u.id)).forEach(u => moneyMult = u.val);
-            const profit = Math.floor(note * 150 * game.reputation * moneyMult);
-
-            // Aplicar Bônus de XP dos Upgrades
-            let xpMult = 1.0;
-            UPGRADES.filter(u => u.bonus === "xp" && game.inventory.includes(u.id)).forEach(u => xpMult = u.val);
+            let xMult = 1.0;
+            UPGRADES.filter(u => u.bonus === "xp" && game.inventory.includes(u.id)).forEach(u => xMult = u.val);
 
             game.money += profit;
             game.reputation += note > 8 ? 0.2 : 0.05;
             
-            addLog(note, profit);
-            gainXP(Math.floor(note * 30 * xpMult));
+            const log = document.getElementById('gameLog');
+            const entry = document.createElement('div');
+            entry.className = "log-entry";
+            entry.innerHTML = `<b>Nota: ${note}/10</b> | Lucro: $${profit}`;
+            log.prepend(entry);
             
+            gainXP(Math.floor(note * 35 * xMult));
             game.stats = { gameplay: 0, graphics: 0, story: 0, optimization: 0 };
             updateUI();
-            saveGame();
         }
 
         function gainXP(amt) {
             if (game.level >= 50) return;
             game.xp += amt;
             while (game.xp >= game.xpNeeded && game.level < 50) {
-                game.xp -= game.xpNeeded;
-                game.level++;
-                game.xpNeeded = Math.floor(game.xpNeeded * 1.35);
+                game.xp -= game.xpNeeded; game.level++; game.xpNeeded = Math.floor(game.xpNeeded * 1.4);
             }
         }
 
-        function addLog(n, p) {
-            const d = document.createElement('div');
-            d.className = "log-entry";
-            d.innerHTML = `<b>Lançamento: ${n}/10</b><br><small>Receita: +$${p}</small>`;
-            document.getElementById('gameLog').prepend(d);
-        }
+        function resetGame() { if(confirm("Apagar tudo?")) { localStorage.clear(); location.reload(); } }
 
-        function saveGame() { localStorage.setItem('DevZero_Final_S50', JSON.stringify(game)); }
-        function loadGame() {
-            const s = localStorage.getItem('DevZero_Final_S50');
-            if(s) { game = JSON.parse(s); updateUI(); }
-        }
-        function resetGame() { if(confirm("Deseja apagar seu império?")) { localStorage.clear(); location.reload(); } }
-
-        // Fundo
-        const canvas = document.getElementById('bgCanvas'); const ctx = canvas.getContext('2d');
-        let pts = [];
-        function initC() {
+        window.onload = () => {
+            const saved = localStorage.getItem('DevZero_Save');
+            if(saved) game = JSON.parse(saved);
+            
+            // Fundo Animado
+            const canvas = document.getElementById('bgCanvas'); const ctx = canvas.getContext('2d');
             canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            pts = Array.from({length: 30}, () => ({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, v: 0.4+Math.random(), s: Math.random()*2 }));
-        }
-        function anim() {
-            ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle = "rgba(0,255,170,0.1)";
-            pts.forEach(p => { p.y -= p.v; if(p.y < 0) p.y = canvas.height; ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill(); });
-            requestAnimationFrame(anim);
-        }
-
-        window.onload = () => { loadGame(); initC(); anim(); updateUI(); };
+            let pts = Array.from({length: 40}, () => ({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, v: 0.2+Math.random()*0.5, s: Math.random()*1.5 }));
+            function anim() {
+                ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle = "rgba(0,255,170,0.08)";
+                pts.forEach(p => { p.y -= p.v; if(p.y < 0) p.y = canvas.height; ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill(); });
+                requestAnimationFrame(anim);
+            }
+            anim(); updateUI();
+        };
     </script>
 </body>
 </html>
