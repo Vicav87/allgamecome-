@@ -46,7 +46,7 @@ h1 {
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    color: transparent; /* fallback para navegadores sem suporte */
+    color: transparent;
 }
 
 .stats {
