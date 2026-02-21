@@ -3,184 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dev From Zero - Final Edition</title>
+    <title>Dev From Zero - Hardcore Biz</title>
     <style>
         :root {
             --neon: #00ffaa;
-            --neon-glow: rgba(0, 255, 170, 0.4);
-            --bg: #0a0a0f;
-            --glass: rgba(25, 25, 40, 0.9);
+            --bg: #050508;
+            --glass: rgba(20, 20, 30, 0.95);
             --text: #ffffff;
-            --card-bg: rgba(255, 255, 255, 0.03);
-            --danger: #ff4d6d;
-            --warning: #ffcc00;
+            --danger: #ff3e3e;
         }
 
         body {
-            margin: 0; font-family: 'Inter', system-ui, sans-serif;
-            background: var(--bg); color: var(--text);
-            overflow-x: hidden; padding: 20px 10px;
+            margin: 0; font-family: 'Inter', sans-serif;
+            background: var(--bg); color: var(--text); padding: 15px;
         }
 
         #bgCanvas { position: fixed; top: 0; left: 0; z-index: -1; }
 
         header {
-            max-width: 480px; margin: 0 auto 15px auto; padding: 20px;
-            border-radius: 24px; background: var(--glass);
-            backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.08);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 450px; margin: 0 auto 15px; padding: 15px;
+            border-radius: 20px; background: var(--glass); border: 1px solid #222;
         }
 
-        .logo { 
-            font-size: 1.6rem; font-weight: 900; text-align: center;
-            background: linear-gradient(to right, #00ffaa, #00d4ff);
-            -webkit-background-clip: text; background-clip: text;
-            -webkit-text-fill-color: transparent; margin-bottom: 15px;
-        }
-        
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .stat-card { 
-            background: var(--card-bg); padding: 10px 5px; border-radius: 15px; 
-            text-align: center; border: 1px solid rgba(255,255,255,0.05);
-        }
-        .stat-card b { font-size: 1rem; color: var(--neon); }
-        .stat-card small { display: block; font-size: 0.6rem; color: #888; text-transform: uppercase; }
+        .stat-card { background: rgba(255,255,255,0.03); padding: 8px; border-radius: 12px; text-align: center; }
+        .stat-card b { color: var(--neon); font-size: 0.9rem; }
+        .stat-card small { display: block; font-size: 0.55rem; color: #777; text-transform: uppercase; }
 
-        .xp-wrapper { margin-top: 15px; }
-        .xp-container { background: rgba(0,0,0,0.5); height: 5px; border-radius: 10px; overflow: hidden; }
-        .xp-fill { background: linear-gradient(90deg, #00ffaa, #0088ff); height: 100%; width: 0%; transition: width 0.6s ease; }
-
-        nav.tabs { max-width: 480px; margin: 0 auto 15px auto; display: flex; gap: 8px; }
-        .tab-btn {
-            flex: 1; padding: 14px; border: none; border-radius: 18px;
-            background: var(--glass); color: #666; 
-            cursor: pointer; font-weight: bold; transition: 0.3s;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-        .tab-btn.active { 
-            background: var(--neon); color: #000; 
-            box-shadow: 0 4px 15px var(--neon-glow); border-color: var(--neon);
+        .hype-banner {
+            background: rgba(0, 255, 170, 0.05); border: 1px solid var(--neon);
+            padding: 6px; border-radius: 10px; margin: 10px 0; text-align: center;
+            font-size: 0.75rem; font-weight: bold; color: var(--neon);
         }
 
-        main.content-area {
-            max-width: 480px; margin: 0 auto; padding: 25px;
-            border-radius: 28px; background: var(--glass);
-            backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.08);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        /* MODAL DE CONTAS (ESTILO FATURA) */
+        #billModal {
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 85%; max-width: 380px; background: #0f0f1a; padding: 25px;
+            border-radius: 20px; border: 1px solid var(--danger); z-index: 1000;
+            box-shadow: 0 0 100px rgba(0,0,0,0.9);
         }
 
-        .tab-content { display: none; animation: slideUp 0.3s ease; }
+        nav.tabs { max-width: 450px; margin: 0 auto 10px; display: flex; gap: 5px; }
+        .tab-btn { flex: 1; padding: 10px; border: none; border-radius: 12px; background: #1a1a25; color: #555; cursor: pointer; font-size: 0.8rem; }
+        .tab-btn.active { background: var(--neon); color: #000; font-weight: bold; }
+
+        main { max-width: 450px; margin: 0 auto; padding: 15px; border-radius: 20px; background: var(--glass); border: 1px solid #222; }
+        .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* TEST AREA */
-        .test-box { 
-            background: rgba(0,0,0,0.3); border: 1px dashed #444; 
-            padding: 15px; border-radius: 18px; margin-top: 20px; text-align: center;
-        }
-        .test-result { font-size: 0.85rem; margin-top: 10px; line-height: 1.4; color: var(--warning); }
-
-        .ctrl-btn { 
-            flex: 1; border: none; padding: 12px; border-radius: 12px;
-            background: linear-gradient(145deg, #1e1e2e, #14141f);
-            color: #fff; cursor: pointer; font-weight: bold;
-            border: 1px solid rgba(255,255,255,0.1);
-            transition: all 0.2s; box-shadow: 0 4px 0 #000;
-        }
-        .ctrl-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #000; }
-        .btn-plus { color: var(--neon); }
-        .btn-sub { color: var(--danger); }
-
-        .main-btn { 
-            width: 100%; padding: 18px; border: none; border-radius: 18px;
-            background: linear-gradient(135deg, #00ffaa, #00cc88);
-            color: #003322; font-weight: 900; font-size: 1rem; cursor: pointer;
-            box-shadow: 0 6px 20px var(--neon-glow); text-transform: uppercase;
-        }
-        .main-btn:disabled { background: #333; color: #666; box-shadow: none; cursor: not-allowed; }
-
-        .secondary-btn {
-            width: 100%; padding: 12px; border: 1px solid var(--neon); background: transparent;
-            color: var(--neon); border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px;
-        }
-        .secondary-btn:disabled { opacity: 0.3; cursor: not-allowed; border-color: #444; color: #444; }
-
-        .upgrade-item { 
-            background: rgba(255,255,255,0.02); padding: 15px; border-radius: 18px; 
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05);
-        }
-        .buy-btn { background: #fff; color: #000; border: none; padding: 8px 14px; border-radius: 10px; font-weight: 800; cursor: pointer; }
-
-        .attr-card { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 18px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.03); }
-        .attr-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.8rem; font-weight: bold; color: #aaa; }
-        .attr-header span { color: var(--neon); }
-
-        .log-entry { background: var(--card-bg); padding: 12px; border-radius: 12px; margin-bottom: 8px; border-left: 3px solid var(--neon); font-size: 0.8rem; }
+        .attr-card { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 12px; margin-bottom: 8px; border: 1px solid #1a1a1a; }
+        .attr-header { display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 5px; }
         
-        @keyframes slideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .ctrl-btn { flex: 1; border: none; padding: 8px; border-radius: 8px; background: #222; color: #fff; cursor: pointer; }
+        .ctrl-btn:active { background: var(--neon); color: #000; }
+        
+        .main-btn { width: 100%; padding: 15px; border: none; border-radius: 12px; background: var(--neon); color: #000; font-weight: 800; cursor: pointer; }
+        .main-btn:disabled { background: #222; color: #444; }
+
+        .upgrade-item { background: rgba(255,255,255,0.02); padding: 10px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .buy-btn { background: #fff; border: none; padding: 6px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.7rem; }
     </style>
 </head>
 <body>
     <canvas id="bgCanvas"></canvas>
 
+    <div id="billModal">
+        <h3 style="color:var(--danger); margin-top:0; text-align: center;">RELATÓRIO MENSAL 📉</h3>
+        <div id="billDetails" style="font-size: 0.85rem; font-family: monospace; background: #000; padding: 15px; border-radius: 10px; border: 1px solid #222;"></div>
+        <button class="main-btn" onclick="payBills()" style="margin-top:20px; background: var(--danger); color: white;">CONFIRMAR PAGAMENTO</button>
+    </div>
+
     <header>
-        <div class="logo">DEV FROM ZERO</div>
+        <div class="logo">DEV FROM ZERO <small style="font-size: 0.6rem; color: var(--danger);">HARDCORE</small></div>
         <div class="stats-grid">
-            <div class="stat-card"><small>Grana</small><b>$<span id="money">0</span></b></div>
-            <div class="stat-card"><small>⭐ Rep</small><b><span id="reputation">0</span></b></div>
-            <div class="stat-card"><small>Level</small><b><span id="level">1</span></b></div>
+            <div class="stat-card"><small>Caixa</small><b>$<span id="money">0</span></b></div>
+            <div class="stat-card"><small>Dia</small><b><span id="dayCount">1</span>/10</b></div>
+            <div class="stat-card"><small>Nível</small><b><span id="level">1</span></b></div>
         </div>
-        <div class="xp-wrapper">
-            <div class="xp-container"><div id="xpBar" class="xp-fill"></div></div>
-        </div>
+        <div class="hype-banner">HYPE: <span id="hypeTag">---</span></div>
     </header>
 
     <nav class="tabs">
-        <button onclick="showTab('dev')" class="tab-btn active" id="btn-dev">PROJETO</button>
-        <button onclick="showTab('office')" class="tab-btn" id="btn-office">ESTÚDIO</button>
-        <button onclick="showTab('history')" class="tab-btn" id="btn-history">FEED</button>
+        <button onclick="showTab('dev')" class="tab-btn active" id="btn-dev">DESENVOLVIMENTO</button>
+        <button onclick="showTab('office')" class="tab-btn" id="btn-office">UPGRADES</button>
     </nav>
 
-    <main class="content-area">
+    <main>
         <div id="dev" class="tab-content active">
-            <div style="text-align: center; font-size: 0.7rem; color: #555; margin-bottom: 15px;">
-                CAPACIDADE: <strong id="currentPoints" style="color:var(--neon)">0</strong> / <strong id="maxPoints">0</strong>
-            </div>
-            
+            <div style="text-align: center; font-size: 0.65rem; color: #555; margin-bottom: 8px;">CAPACIDADE: <span id="currentPoints">0</span>/<span id="maxPoints">0</span></div>
             <div id="attrContainer"></div>
-            
-            <button id="publishBtn" class="main-btn" onclick="publishGame()" disabled style="margin-top: 10px;">Lançar Jogo</button>
-            
-            <div class="test-box">
-                <button id="testBtn" class="secondary-btn" onclick="testGame()" disabled>Testar Projeto (LVL 10)</button>
-                <div id="testResult" class="test-result"></div>
-            </div>
+            <p style="font-size: 0.6rem; color: #444; text-align: center;">Custo de Lançamento: $50 + Marketing</p>
+            <button id="publishBtn" class="main-btn" onclick="publishGame()" disabled>LANÇAR PROJETO</button>
         </div>
 
         <div id="office" class="tab-content">
             <div id="upgradeList"></div>
-            <center><small onclick="resetGame()" style="cursor:pointer; color: #333; margin-top: 20px; display: block;">Resetar Save</small></center>
-        </div>
-
-        <div id="history" class="tab-content">
-            <div id="gameLog" style="max-height: 350px; overflow-y: auto;"></div>
+            <div style="text-align: center; margin-top: 15px;"><small onclick="resetGame()" style="color: #222; cursor: pointer;">Resetar Progressão</small></div>
         </div>
     </main>
 
     <script>
         let game = {
-            money: 500, reputation: 1.0, level: 1, xp: 0, xpNeeded: 100,
-            inventory: [],
-            stats: { gameplay: 0, graphics: 0, story: 0, optimization: 0 }
+            money: 600, level: 1, xp: 0, xpNeeded: 100,
+            day: 1, inventory: [],
+            stats: { gameplay: 0, graphics: 0, story: 0, optimization: 0 },
+            currentHype: 'gameplay'
         };
 
         const UPGRADES = [
-            { id: "desk", name: "Cadeira Gamer", cost: 350, level: 2, bonus: "points", val: 5, desc: "+5 Capacidade" },
-            { id: "course", name: "Curso XP", cost: 800, level: 4, bonus: "xp", val: 1.3, desc: "+30% Exp" },
-            { id: "pc_mid", name: "PC Gamer", cost: 3000, level: 10, bonus: "points", val: 25, desc: "+25 Capacidade" },
-            { id: "ads", name: "Marketing", cost: 6000, level: 15, bonus: "money", val: 1.5, desc: "+50% Lucro" },
-            { id: "office", name: "Escritório", cost: 40000, level: 30, bonus: "money", val: 3.0, desc: "3x Lucro" },
-            { id: "legend", name: "Prédio Global", cost: 200000, level: 50, bonus: "money", val: 6.0, desc: "6x Lucro" }
+            { id: "s1", name: "Estagiário", cost: 500, level: 2, val: 10, salary: 250 },
+            { id: "d1", name: "Escritório", cost: 2500, level: 5, val: 1.5, salary: 800 },
+            { id: "s2", name: "Dev Fullstack", cost: 12000, level: 12, val: 50, salary: 2500 },
+            { id: "d2", name: "Estúdio Pro", cost: 45000, level: 25, val: 5.0, salary: 10000 }
         ];
 
         function showTab(id) {
@@ -192,136 +127,128 @@
 
         function updateUI() {
             document.getElementById('money').innerText = Math.floor(game.money).toLocaleString();
-            document.getElementById('reputation').innerText = game.reputation.toFixed(1);
+            document.getElementById('dayCount').innerText = game.day;
             document.getElementById('level').innerText = game.level;
-            document.getElementById('xpBar').style.width = (game.xp / game.xpNeeded * 100) + "%";
+            document.getElementById('hypeTag').innerText = game.currentHype.toUpperCase();
             
             let bPoints = 0;
-            UPGRADES.filter(u => u.bonus === "points" && game.inventory.includes(u.id)).forEach(u => bPoints += u.val);
-            const max = 20 + (game.level * 5) + bPoints;
+            UPGRADES.filter(u => game.inventory.includes(u.id) && u.salary < 1000).forEach(u => bPoints += u.val);
+            if(game.inventory.includes("s2")) bPoints += 50;
+
+            const max = 15 + (game.level * 4) + bPoints;
             const current = Object.values(game.stats).reduce((a, b) => a + b, 0);
-            
+
             document.getElementById('currentPoints').innerText = current;
             document.getElementById('maxPoints').innerText = max;
             document.getElementById('publishBtn').disabled = (current === 0);
 
-            // Controle do botão de teste
-            const testBtn = document.getElementById('testBtn');
-            if(game.level >= 10) {
-                testBtn.disabled = (current === 0);
-                testBtn.innerText = "Testar Projeto";
-            } else {
-                testBtn.disabled = true;
-                testBtn.innerText = "Testar Projeto (LVL 10)";
-            }
-
             renderAttributes(max, current);
-            renderUpgradeTab();
-            localStorage.setItem('DevZero_Save', JSON.stringify(game));
+            renderUpgrades();
+            localStorage.setItem('DevZero_Hardcore', JSON.stringify(game));
         }
 
         function renderAttributes(max, current) {
-            const container = document.getElementById('attrContainer');
-            container.innerHTML = Object.keys(game.stats).map(key => `
-                <div class="attr-card">
-                    <div class="attr-header">${key.toUpperCase()} <span>${game.stats[key]}</span></div>
-                    <div class="btn-group" style="display:flex; gap:5px;">
-                        <button class="ctrl-btn btn-sub" onclick="modifyAttr('${key}', -1, ${max}, ${current})">-1</button>
-                        <button class="ctrl-btn btn-plus" onclick="modifyAttr('${key}', 1, ${max}, ${current})">+1</button>
-                        <button class="ctrl-btn btn-plus" onclick="modifyAttr('${key}', 5, ${max}, ${current})">+5</button>
+            document.getElementById('attrContainer').innerHTML = Object.keys(game.stats).map(cat => `
+                <div class="attr-card" style="border-right: 2px solid ${cat === game.currentHype ? 'var(--neon)' : 'transparent'}">
+                    <div class="attr-header">${cat.toUpperCase()} <b>${game.stats[cat]}</b></div>
+                    <div style="display:flex; gap:4px;">
+                        <button class="ctrl-btn" onclick="mod('${cat}', 1, ${max}, ${current})">+1</button>
+                        <button class="ctrl-btn" onclick="mod('${cat}', 5, ${max}, ${current})">+5</button>
                     </div>
                 </div>
             `).join('');
         }
 
-        function modifyAttr(key, amt, max, current) {
-            if (amt > 0) { if (current + amt <= max) game.stats[key] += amt; } 
-            else { game.stats[key] = Math.max(0, game.stats[key] + amt); }
-            document.getElementById('testResult').innerText = ""; // Limpa teste ao mexer
-            updateUI();
-        }
+        function mod(k, v, m, c) { if(c + v <= m) game.stats[k] += v; updateUI(); }
 
-        function testGame() {
-            const total = Object.values(game.stats).reduce((a, b) => a + b, 0);
-            const expectedNote = Math.min(10, (total / (20 + game.level * 4.5) * 10));
-            let feedback = `Análise QA: Previsão de nota ${expectedNote.toFixed(1)}/10.`;
-            
-            // Sugestões (Liberadas LVL 30)
-            if(game.level >= 30) {
-                let lowAttr = Object.keys(game.stats).reduce((a, b) => game.stats[a] < game.stats[b] ? a : b);
-                feedback += `<br><span style="color:var(--neon)">💡 Sugestão: Seu '${lowAttr}' está baixo. Melhore-o para equilibrar o projeto!</span>`;
-            } else {
-                feedback += `<br><small style="color:#666">(Sugestões detalhadas liberam no LVL 30)</small>`;
-            }
-            
-            document.getElementById('testResult').innerHTML = feedback;
-        }
-
-        function renderUpgradeTab() {
-            const list = document.getElementById('upgradeList');
-            list.innerHTML = UPGRADES.map(u => {
-                const isLocked = game.level < u.level;
-                const isOwned = game.inventory.includes(u.id);
+        function renderUpgrades() {
+            document.getElementById('upgradeList').innerHTML = UPGRADES.map(u => {
+                const owned = game.inventory.includes(u.id);
                 return `
-                <div class="upgrade-item ${isLocked ? 'locked' : ''} ${isOwned ? 'owned' : ''}">
-                    <div>
-                        <small style="color:var(--neon)">NV ${u.level}</small>
-                        <div style="font-weight:bold; font-size:0.9rem">${u.name}</div>
-                        <div style="font-size:0.7rem; color: #555">${u.desc}</div>
-                    </div>
-                    <button class="buy-btn" onclick="buyItem('${u.id}', ${u.cost})" ${(isLocked || isOwned) ? 'disabled' : ''}>
-                        ${isOwned ? '✓' : '$'+u.cost}
+                <div class="upgrade-item">
+                    <div style="font-size:0.75rem"><b>${u.name}</b><br><small>Salário: $${u.salary}</small></div>
+                    <button class="buy-btn" onclick="buy('${u.id}', ${u.cost})" ${owned || game.level < u.level ? 'disabled' : ''}>
+                        ${owned ? 'ATIVO' : '$'+u.cost}
                     </button>
                 </div>`;
             }).join('');
         }
 
-        function buyItem(id, cost) {
-            if (game.money >= cost) { game.money -= cost; game.inventory.push(id); updateUI(); }
-        }
+        function buy(id, cost) { if(game.money >= cost) { game.money -= cost; game.inventory.push(id); updateUI(); } }
 
         function publishGame() {
-            const total = Object.values(game.stats).reduce((a, b) => a + b, 0);
-            const note = Math.min(10, (total / (20 + game.level * 4.5) * 10)).toFixed(1);
+            const vals = Object.values(game.stats);
+            const total = vals.reduce((a, b) => a + b, 0);
+            
+            // Penalidade de Equilíbrio (Aumentada)
+            const avg = total / 4;
+            let penalty = 1.0;
+            vals.forEach(v => { if(v < avg * 0.5) penalty -= 0.2; });
+
+            // Custo de lançamento
+            const launchCost = 50 + (total * 2);
+            game.money -= launchCost;
+
+            // Lucro
             let mMult = 1.0;
-            UPGRADES.filter(u => u.bonus === "money" && game.inventory.includes(u.id)).forEach(u => mMult = u.val);
-            const profit = Math.floor(note * 180 * game.reputation * mMult);
-            let xMult = 1.0;
-            UPGRADES.filter(u => u.bonus === "xp" && game.inventory.includes(u.id)).forEach(u => xMult = u.val);
-            game.money += profit; game.reputation += note > 8 ? 0.2 : 0.05;
-            const log = document.getElementById('gameLog');
-            const entry = document.createElement('div');
-            entry.className = "log-entry";
-            entry.innerHTML = `<b>Lançamento: ${note}/10</b> | Lucro: $${profit}`;
-            log.prepend(entry);
-            gainXP(Math.floor(note * 35 * xMult));
+            if(game.inventory.includes("d1")) mMult = 1.5;
+            if(game.inventory.includes("d2")) mMult = 5.0;
+
+            const hypeBonus = (game.stats[game.currentHype] / total) > 0.4 ? 1.6 : 1.0;
+            const profit = Math.floor((total * 20) * Math.max(0.1, penalty) * hypeBonus * mMult);
+            
+            game.money += profit;
+            game.day++;
+            game.currentHype = Object.keys(game.stats)[Math.floor(Math.random() * 4)];
             game.stats = { gameplay: 0, graphics: 0, story: 0, optimization: 0 };
-            document.getElementById('testResult').innerText = "";
+            
+            gainXP(total * 2);
+            if(game.day > 10) showBills();
+            else updateUI();
+        }
+
+        function showBills() {
+            let fixed = 300; // Custo de vida subiu
+            let payroll = 0;
+            UPGRADES.filter(u => game.inventory.includes(u.id)).forEach(u => payroll += u.salary);
+            
+            let tax = Math.floor(game.money * 0.15); // Imposto de Riqueza
+            if(game.money < 0) tax = 0;
+
+            let total = fixed + payroll + tax;
+            document.getElementById('billDetails').innerHTML = `
+                FIXO: -$${fixed}<br>
+                SALÁRIOS: -$${payroll}<br>
+                IMPOSTO (15%): -$${tax}<br>
+                -------------------<br>
+                DÉBITO TOTAL: $${total}
+            `;
+            document.getElementById('billModal').style.display = 'block';
+            game.pendingBills = total;
+        }
+
+        function payBills() {
+            game.money -= game.pendingBills;
+            game.day = 1;
+            document.getElementById('billModal').style.display = 'none';
+            if(game.money < -500) { // Tolerância de dívida curta
+                alert("BANCO CENTRAL: Seu estúdio faliu por dívidas acumuladas.");
+                localStorage.clear(); location.reload();
+            }
             updateUI();
         }
 
-        function gainXP(amt) {
-            if (game.level >= 50) return;
-            game.xp += amt;
-            while (game.xp >= game.xpNeeded && game.level < 50) {
-                game.xp -= game.xpNeeded; game.level++; game.xpNeeded = Math.floor(game.xpNeeded * 1.4);
-            }
+        function gainXP(v) {
+            game.xp += v;
+            if(game.xp >= game.xpNeeded) { game.level++; game.xp = 0; game.xpNeeded = Math.floor(game.xpNeeded * 1.5); }
         }
 
-        function resetGame() { if(confirm("Apagar tudo?")) { localStorage.clear(); location.reload(); } }
+        function resetGame() { if(confirm("Zerar tudo?")) { localStorage.clear(); location.reload(); } }
 
         window.onload = () => {
-            const saved = localStorage.getItem('DevZero_Save');
+            const saved = localStorage.getItem('DevZero_Hardcore');
             if(saved) game = JSON.parse(saved);
-            const canvas = document.getElementById('bgCanvas'); const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            let pts = Array.from({length: 30}, () => ({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, v: 0.2+Math.random()*0.4, s: Math.random()*1.2 }));
-            function anim() {
-                ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle = "rgba(0,255,170,0.05)";
-                pts.forEach(p => { p.y -= p.v; if(p.y < 0) p.y = canvas.height; ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, Math.PI*2); ctx.fill(); });
-                requestAnimationFrame(anim);
-            }
-            anim(); updateUI();
+            updateUI();
         };
     </script>
 </body>
