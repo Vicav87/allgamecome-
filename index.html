@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dev From Zero - Ultimate XP Edition</title>
+    <title>Dev From Zero - PRO EDITION 350+</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -71,7 +71,6 @@
         .btn-group { display: flex; gap: 8px; }
         .btn-group button { flex: 1; padding: 12px; border: none; border-radius: 12px; background: #151520; color: white; cursor: pointer; border: 1px solid #333; font-weight: bold; }
         .btn-group .btn-min { background: #251515; color: var(--danger); }
-        .btn-group button:active { background: var(--neon); color: #000; }
 
         .main-btn { 
             width: 100%; padding: 20px; border-radius: 20px; border: none; background: var(--neon); 
@@ -169,11 +168,30 @@
             { id: "ai", name: "IA Neural Corp", cost: 800000, type: "cap", val: 400, salary: 60000, desc: "+400 Capacidade" }
         ];
 
-        // --- COMANDOS DE CONSOLE REFORÇADOS ---
+        // --- COMANDOS DE CONSOLE REFORÇADOS (FIXED) ---
         window.addMoney = function(v) { game.money += v; updateUI(); return "Grana + " + v; };
-        window.addXP = function(v) { gainXP(v); updateUI(); return "XP + " + v; };
-        window.setLevel = function(v) { game.level = v; game.xp = 0; updateUI(); return "Nível definido para " + v; };
+        window.setMoney = function(v) { game.money = v; updateUI(); return "Grana setada!"; };
         window.unlockAll = function() { UPGRADES.forEach(u => { if(!game.inventory.includes(u.id)) game.inventory.push(u.id); }); updateUI(); return "Tudo liberado!"; };
+        
+        window.addXP = function(v) { 
+            game.xp += v; 
+            while(game.xp >= game.xpNeeded && game.level < 1000) {
+                game.xp -= game.xpNeeded;
+                game.level++;
+                game.xpNeeded = Math.floor(game.xpNeeded * 1.5);
+            }
+            updateUI(); 
+            return "XP e Level atualizados!"; 
+        };
+
+        window.setLevel = function(v) { 
+            game.level = v; 
+            game.xp = 0; 
+            game.xpNeeded = 150; 
+            for(let i=1; i<v; i++) { game.xpNeeded = Math.floor(game.xpNeeded * 1.5); }
+            updateUI(); 
+            return "Nível definido para " + v; 
+        };
 
         function showTab(id) {
             document.querySelectorAll('.tab-content, .tab-btn').forEach(el => el.classList.remove('active'));
@@ -206,7 +224,6 @@
 
             renderAttributes(max, current);
             renderUpgrades();
-            
             localStorage.setItem('DevZero_Master_Ultimate', JSON.stringify(game));
         }
 
@@ -266,7 +283,7 @@
 
             const item = document.createElement('div');
             item.className = "log-entry";
-            item.innerHTML = `<span>Dia ${game.day} - Lançamento</span> <b>+$${profit.toLocaleString()}</b>`;
+            item.innerHTML = `<span>Lançamento</span> <b>+$${profit.toLocaleString()}</b>`;
             document.getElementById('gameLog').prepend(item);
 
             game.day++;
@@ -281,7 +298,7 @@
             let taxRate = game.inventory.includes("tax") ? 0.05 : 0.15;
             let taxes = Math.floor(Math.max(0, game.money * taxRate));
             let total = 600 + sal + taxes;
-            document.getElementById('billDetails').innerHTML = `Custo de Vida: -$600<br>Salários: -$${sal}<br>Impostos (${taxRate*100}%): -$${taxes}<hr><b>TOTAL: -$${total}</b>`;
+            document.getElementById('billDetails').innerHTML = `Custo: -$600<br>Salários: -$${sal}<br>Impostos: -$${taxes}<hr><b>TOTAL: -$${total}</b>`;
             document.getElementById('billModal').style.display = 'block';
             game.pendingBills = total;
         }
@@ -295,7 +312,7 @@
 
         function gainXP(v) {
             game.xp += v;
-            while(game.xp >= game.xpNeeded && game.level < 100) {
+            while(game.xp >= game.xpNeeded && game.level < 1000) {
                 game.xp -= game.xpNeeded; game.level++; game.xpNeeded = Math.floor(game.xpNeeded * 1.5);
             }
         }
@@ -305,10 +322,6 @@
             const total = vals.reduce((a, b) => a + b, 0);
             let bad = false; vals.forEach(v => { if(v < (total/4) * 0.45) bad = true; });
             let res = bad ? "⚠️ PROJETO DESEQUILIBRADO" : "✅ PROJETO ESTÁVEL";
-            if(game.level >= 30) {
-                let low = Object.keys(game.stats).reduce((a, b) => game.stats[a] < game.stats[b] ? a : b);
-                res += `<br><small>FOQUE MAIS EM: ${low.toUpperCase()}</small>`;
-            }
             document.getElementById('qaResult').innerHTML = res;
         }
 
