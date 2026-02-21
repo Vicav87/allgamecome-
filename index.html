@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dev From Zero - Ultimate Master</title>
+    <title>Dev From Zero - Ultimate XP Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -169,10 +169,10 @@
             { id: "ai", name: "IA Neural Corp", cost: 800000, type: "cap", val: 400, salary: 60000, desc: "+400 Capacidade" }
         ];
 
-        // --- COMANDOS DE CONSOLE (VERSÃO SEGURA) ---
-        window.addMoney = function(v) { game.money += v; updateUI(); return "Injetado: " + v; };
-        window.setMoney = function(v) { game.money = v; updateUI(); return "Definido para: " + v; };
-        window.setLevel = function(v) { game.level = v; updateUI(); return "Nível: " + v; };
+        // --- COMANDOS DE CONSOLE REFORÇADOS ---
+        window.addMoney = function(v) { game.money += v; updateUI(); return "Grana + " + v; };
+        window.addXP = function(v) { gainXP(v); updateUI(); return "XP + " + v; };
+        window.setLevel = function(v) { game.level = v; game.xp = 0; updateUI(); return "Nível definido para " + v; };
         window.unlockAll = function() { UPGRADES.forEach(u => { if(!game.inventory.includes(u.id)) game.inventory.push(u.id); }); updateUI(); return "Tudo liberado!"; };
 
         function showTab(id) {
@@ -207,7 +207,6 @@
             renderAttributes(max, current);
             renderUpgrades();
             
-            // AUTO-SAVE GARANTIDO
             localStorage.setItem('DevZero_Master_Ultimate', JSON.stringify(game));
         }
 
